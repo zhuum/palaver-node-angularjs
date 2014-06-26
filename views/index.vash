@@ -1,0 +1,112 @@
+@html.extend('layout', function (model) {
+	@html.block('body', function (model) {
+
+
+	    <div class="container">
+
+			<div class="row row-offcanvas row-offcanvas-right">
+		    
+			    <div class="col-xs-12 col-sm-9">
+
+					<p class="pull-right visible-xs">
+						<button type="button" class="btn btn-primary btn-xs" data-toggle="offcanvas">Threads</button>
+					</p>
+
+		    		<h2>stupid shit</h2>
+
+	    			<div class="comment">
+	    				<div class="comment-heading "><span class="user">marcus</span> <span class="highlight">2/28/2014 10:14am</span>
+	    					<button class="right reply btn btn-primary btn-xs" data-toggle="modal" data-target="#editor">reply</button>
+	    				</div>
+    					<div>
+	    					<p>Your bones don't break, mine do. That's clear. Your cells react to bacteria and viruses differently than mine. You don't get sick, I do. That's also clear. But for some reason, you and I react the exact same way to water. We swallow it too fast, we choke. We get some in our lungs, we drown. However unreal it may seem, we are connected, you and I. We're on the same curve, just on opposite ends.</p>
+	    				</div>
+		    			<div class="comment">
+		    				<div class="comment-heading"><span class="user">marcus</span> <span class="highlight">2/28/2014 10:14am</span> <button class="right reply btn btn-primary btn-xs" data-toggle="modal" data-target="#editor">reply</button></div>
+	    					<div>
+		    					<p>this is just a test</p>
+		    				</div>
+			    			<div class="comment">
+			    				<div class="comment-heading"><span class="user">marcus</span> <span class="highlight">2/28/2014 10:14am</span> <button class="right reply btn btn-primary btn-xs" data-toggle="modal" data-target="#editor">reply</button></div>
+		    					<div>
+			    					<p>this is just a test</p>
+			    				</div>
+			    				
+			    			</div>			    				
+		    			</div>	    				
+		    			<div class="comment">
+		    				<div class="comment-heading"><span class="user">marcus</span> <span class="highlight">2/28/2014 10:14am</span> <button class="right reply btn btn-primary btn-xs" data-toggle="modal" data-target="#editor">reply</button></div>
+	    					<div>
+		    					<p>this is just a test</p>
+		    				</div>
+		    				
+		    			</div>	
+		    			<div class="comment">
+		    				<div class="comment-heading"><span class="user">marcus</span> <span class="highlight">2/28/2014 10:14am</span> <button class="right reply btn btn-primary btn-xs" data-toggle="modal" data-target="#editor">reply</button></div>
+	    					<div>
+		    					<p>this is just a test</p>
+		    				</div>
+		    				
+		    			</div>
+		    			<div class="comment">
+		    				<div class="comment-heading"><span class="user">marcus</span> <span class="highlight">2/28/2014 10:14am</span> <button class="right reply btn btn-primary btn-xs" data-toggle="modal" data-target="#editor">reply</button></div>
+	    					<div>
+		    					<p>this is just a test</p>
+		    				</div>
+		    				
+		    			</div>
+
+		    			<div class="comment">
+		    				<div class="comment-heading"><span class="user">marcus</span> <span class="highlight">2/28/2014 10:14am</span> <button class="right reply btn btn-primary btn-xs" data-toggle="modal" data-target="#editor">reply</button></div>
+	    					<div>
+		    					<p>this is just a test</p>
+		    				</div>
+		    				
+		    			</div>		    			
+	    			</div>
+			    </div>
+
+
+		        <div class="col-xs-6 col-sm-3 sidebar-offcanvas" id="sidebar" role="navigation">
+
+					<div class="list-group">
+
+						@model.threads.forEach(function(thread) {
+
+							<a href="#" class="list-group-item">seed - @thread.message</a>
+
+						})
+					</div>
+		        </div>
+	        </div>
+
+	    </div>
+
+	    <div class="modal fade" id="editor" role="dialog" aria-hidden="true" aria-labelledby="myModalLabel">
+	    	<div class="modal-dialog modal-lg">
+	    		<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+						<h4 class="modal-title" id="myModalLabel">Write something</h4>
+					</div>	    		
+					<div class="modal-body" style="background-color: white;">
+
+						<textarea id="some-textarea" placeholder="Enter text ..." style="width:100%; height: 250px;"></textarea>
+
+					</div>
+
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+						<button type="button" class="btn btn-primary">Post</button>
+					</div>				
+				</div>
+			</div>
+	    </div>
+
+
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+		<script src="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+
+	})
+})
+

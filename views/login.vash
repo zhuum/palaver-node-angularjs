@@ -1,0 +1,13 @@
+@html.extend('layout', function (model) {
+	@html.block('body', function (model) {
+	    <div class="container">
+
+			<div class="row row-offcanvas row-offcanvas-right">
+				
+				<h1>Login</h1>
+
+			</div>
+		</div>
+
+	})
+})

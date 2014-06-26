@@ -1,0 +1,79 @@
+
+body { padding-top: 60px;}
+
+h2 {
+	margin-top: 0;
+}
+
+.right {
+	float: right;
+}
+
+.highlight {
+	font-style: italic;
+	color: #D4DDD4;
+}
+
+.comment-heading {
+	font-size: .8em;
+}
+
+.user {
+	color: blue;
+}
+
+.comment {
+	margin-bottom: 5px;
+	padding: 5px 1px 0 5px;
+	border: 1px solid #CFCFCF;
+	border-radius: 5px;
+}
+
+.reply {
+	margin-right: 5px;
+}
+
+
+/*
+ * Off Canvas
+ * --------------------------------------------------
+ */
+@media screen and (max-width: 767px) {
+  .row-offcanvas {
+    position: relative;
+    -webkit-transition: all .25s ease-out;
+       -moz-transition: all .25s ease-out;
+            transition: all .25s ease-out;
+  }
+
+  .row-offcanvas-right {
+    right: 0;
+  }
+
+  .row-offcanvas-left {
+    left: 0;
+  }
+
+  .row-offcanvas-right
+  .sidebar-offcanvas {
+    right: -50%; /* 6 columns */
+  }
+
+  .row-offcanvas-left
+  .sidebar-offcanvas {
+    left: -50%; /* 6 columns */
+  }
+
+  .row-offcanvas-right.active {
+    right: 50%; /* 6 columns */
+  }
+
+  .row-offcanvas-left.active {
+    left: 50%; /* 6 columns */
+  }
+
+  .sidebar-offcanvas {
+    position: absolute;
+    top: 0;
+    width: 50%; /* 6 columns */
+  }
