@@ -44,9 +44,9 @@
 				next(err);
 			else {
 
-				var text = 'select name, email, username, passwordHash, salt from users';
+				var text = 'select * from users where username = $1';
 
-				client.query(text, function (err, result) {
+				client.query(text, [username], function (err, result) {
 					release();
 					if (err) {
 						next(err);
