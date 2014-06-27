@@ -1,8 +1,12 @@
 var express = require('express');
 var router = express.Router();
 
+var auth = require('../data/auth');
+
 /* GET home page. */
-router.get('/', function(req, res) {
+router.get('/',
+	auth.ensureAuthenticated,
+	function(req, res) {
 
 	var data = require('../data/threads');
 
@@ -25,9 +29,14 @@ router.get('/', function(req, res) {
 		console.log('active thread: ');
 		console.log(activeThread);
 
-		console.log('rendering');
+		console.log(req.user);
 
-		res.render('index', {threads: results, activeThread: activeThread});
+		res.render('index', {
+			threads: results, 
+			activeThread: activeThread,
+			error: err,
+			user: req.user
+		});
 
 	});
 

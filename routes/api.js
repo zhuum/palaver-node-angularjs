@@ -1,10 +1,10 @@
 var express = require('express');
 var router = express.Router();
 
+var auth = require('../data/auth');
 
 
-
-router.get('/threads/:id', function(req, res) {
+router.get('/threads/:id', auth.ensureApiAuthenticated, function(req, res) {
 	
 	var data = require('../data/comments');
 
@@ -15,12 +15,10 @@ router.get('/threads/:id', function(req, res) {
 
 	});
 
-	res.send({ name: 'foo' });
-
 });
 
 
-router.get('/threads', function(req, res) {
+router.get('/threads', auth.ensureApiAuthenticated, function(req, res) {
 
 	console.log('getting threads data object');
 	
@@ -30,12 +28,12 @@ router.get('/threads', function(req, res) {
 
 	data.getThreads(function (err, results) {
 
+		console.log(results);
+
 		res.set('Content-Type', 'application/json');
 		res.send(results);
 
 	});
-
-	res.send({ name: 'foo' });
 
 });
 
