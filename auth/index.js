@@ -16,7 +16,7 @@ function verifyUser(username, password, next) {
 			var testHash = hash.computeHash(password, user.salt);
 
 			if (testHash === user.passwordhash) {
-				console.log('user verfified');
+				console.log('user verified');
 
 				next(null, user);
 				
@@ -24,18 +24,18 @@ function verifyUser(username, password, next) {
 			}
 		}
 
-		next(null, false, {message: 'Invalid credentials'});
+		next(err, false, {message: 'Invalid credentials'});
 	})
 }
 
 // setup passport authentication
 passport.use(new localstrat(verifyUser));
+
 passport.serializeUser(function (user, next) {
-	console.log('serializeUser');
 	next(null, user.username);
 });
+
 passport.deserializeUser(function (key, next){
-	console.log('deserializeUser');
 	users.getUser(key, function (err, user) {
 		if (err) {
 			next (null, false, {message: 'Failed to get user'});
@@ -47,7 +47,7 @@ passport.deserializeUser(function (key, next){
 
 router.get('/register', function(req, res) {
 
-	res.render('register', {title: 'Register' }); //, message: req.flash('registrationError')  });
+	res.render('register', {title: 'Register', message: req.flash('registrationError')  });
 
 });
 
@@ -69,8 +69,6 @@ router.post('/register', function(req, res) {
 
 	users.addUser(user, function (err) {
 
-		console.log('done adding user');
-
 		if (err) {
 			req.flash('registrationError', 'Could not register.');
 			res.redirect('/auth/register');
@@ -83,7 +81,7 @@ router.post('/register', function(req, res) {
 
 router.get('/login', function(req, res) {
 
-	res.render('login', {title: 'Login'}) //, message: req.flash('loginError')});
+	res.render('login', {title: 'Login', message: req.flash('loginError')});
 
 });
 
@@ -91,14 +89,16 @@ router.get('/login', function(req, res) {
 router.post('/login', function(req, res, next) {
 
 	var authFunc = passport.authenticate('local', function (err, user, info) {
-		if (err) {
-			next(err);
+		if (err || info) {
+            req.flash('loginError', 'Invalid credentials');
+            res.redirect('/auth/login');
 		} else {
-			console.log('authenticated');
 
 			req.logIn(user, function (err) {
 				if (err) {
-					next(err);
+                    req.flash('loginError', err.message);
+                    res.redirect('/auth/login');
+
 				} else {
 					res.redirect('/');
 				}

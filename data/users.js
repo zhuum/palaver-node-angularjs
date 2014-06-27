@@ -55,7 +55,7 @@
 						if (result.rows.length > 0) {
 							next(err, result.rows[0]);
 						} else {
-							next(err, null);
+							next({message: 'No user found'}, null);
 						}
 
 					}

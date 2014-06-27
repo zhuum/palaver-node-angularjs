@@ -6,8 +6,10 @@
 				
 				<h1>Log in</h1>
 
-				@if (model.message) {
-					<p>@model.message</p>
+				@if (model.message != '') {
+                    <div class="alert alert-danger">
+                        @model.message
+                    </div>
 				}
 
 				<form action="/auth/login" method="post" role="form">
