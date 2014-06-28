@@ -3,7 +3,7 @@
     // TODO: move to routes
 
 	auth.ensureAuthenticated = function (req, res, next) {
-		if (req.isAuthenticated()) {
+		if (req.isAuthenticated() && req.user.approved) {
 			next();
 		} else {
 			res.redirect('/auth/login');
@@ -11,7 +11,7 @@
 	}
 
 	auth.ensureApiAuthenticated = function (req, res, next) {
-		if (req.isAuthenticated()) {
+		if (req.isAuthenticated() && req.user.approved) {
 			next();
 		} else {
 			res.send(401, 'Not authorized');

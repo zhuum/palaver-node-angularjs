@@ -7,11 +7,20 @@
 
                 <h1>All users</h1>
 
-                <ul>
+                <ul class="list-group col-lg-7">
 
                 @model.users.forEach(function(user) {
 
-                    <li><a href="/users/@user.username">@user.name</a></li>
+                    <li class="list-group-item ">
+                        <a class="col-lg-2" href="/users/@user.username">@user.name</a>
+                        @if (user.admin) {
+                            <span class="col-lg-offset-1 label label-primary">Admin</span>
+                        } else if (!user.approved) {
+                            <span class="col-lg-offset-1 label label-warning">Not approved</span>
+                            <a href="#" class="col-lg-offset-1">Approve</a>
+                        }
+
+                    </li>
 
                 })
 

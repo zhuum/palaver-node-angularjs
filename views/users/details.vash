@@ -7,10 +7,27 @@
 
         <h1>User details</h1>
 
-        <ul>
-            <li>@model.refUser.name</li>
-            <li>@model.refUser.username</li>
-            <li>@model.refUser.email</li>
+        <ul class="list-group">
+            <li class="list-group-item"><span class="col-md-1">Name </span><span class="col-lg-offset-1">@model.refUser.name</span></li>
+            <li class="list-group-item"><span class="col-md-1">Username</span> <span class="col-lg-offset-1">@model.refUser.username</span></li>
+            <li class="list-group-item"><span class="col-md-1">Email</span> <span class="col-lg-offset-1">@model.refUser.email</span></li>
+            <li class="list-group-item"><span class="col-md-1">Approved</span>
+
+                @if (!model.refUser.approved) {
+                    <span class="col-lg-offset-1 glyphicon glyphicon-remove">&nbsp;</span><a href="#">Approve</a>
+                } else {
+                    <span class="col-lg-offset-1 glyphicon glyphicon-ok">&nbsp;</span>
+                }
+            </li>
+            <li class="list-group-item"><span class="col-lg-1">Admin</span>
+
+                @if (model.refUser.admin) {
+                    <span class="col-lg-offset-1 glyphicon glyphicon-ok">&nbsp;</span>
+                } else {
+                    <span class="col-lg-offset-1 glyphicon glyphicon-remove">&nbsp;</span>
+                }
+
+            </li>
         </ul>
 
     </div>
