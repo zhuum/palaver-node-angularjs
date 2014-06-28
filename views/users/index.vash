@@ -1,0 +1,24 @@
+@html.extend('layout', function (model) {
+    @html.block('body', function (model) {
+
+        <div class="container">
+
+            <div class="row row-offcanvas row-offcanvas-right">
+
+                <h1>All users</h1>
+
+                <ul>
+
+                @model.users.forEach(function(user) {
+
+                    <li><a href="/users/@user.username">@user.name</a></li>
+
+                })
+
+                </ul>
+
+            </div>
+        </div>
+
+    })
+})

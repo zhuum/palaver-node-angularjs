@@ -7,6 +7,12 @@
 
 				<h1>Register</h1>
 
+                @if (model.message != '') {
+                <div class="alert alert-danger">
+                    @model.message
+                </div>
+                }
+
 				<form action="/auth/register" method="post" role="form">
 
 					<div class="form-group"><label class="control-label col-lg-1" for="name">Name</label><input name="name" type="text" /></div>

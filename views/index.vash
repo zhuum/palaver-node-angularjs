@@ -12,6 +12,12 @@
 						<button type="button" class="btn btn-primary btn-xs" data-toggle="offcanvas">Threads</button>
 					</p>
 
+                    @if (model.message != '') {
+                    <div class="alert alert-danger">
+                        @model.message
+                    </div>
+                    }
+
 		    		<h2>stupid shit</h2>
 
 	    			<div class="comment">
@@ -78,7 +84,7 @@
 
 						@model.threads.forEach(function(thread) {
 
-							<a href="#" class="list-group-item">seed - @thread.message</a>
+							<a href="/thread/@thread.id" class="list-group-item">@thread.text</a>
 
 						})
 					</div>

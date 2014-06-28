@@ -8,35 +8,36 @@ router.get('/',
 	auth.ensureAuthenticated,
 	function(req, res) {
 
-	var data = require('../data/threads');
+	var threads = require('../data/threads');
+    var comments = require('../data/comments');
 
 	console.log('index');
 
-	data.getThreads(function (err, results) {
+    threads.getThreads(function (err, threads) {
 
-		console.log('got threads');
-
-		console.log(results);
-
-		var activeThread;
-
-		for (var i = results.length - 1; i >= 0; i--) {
-			if (results[i].parentId === 1)
-				activeThread = results[i];
-
-		};
-
-		console.log('active thread: ');
-		console.log(activeThread);
+		console.log(threads);
 
 		console.log(req.user);
 
-		res.render('index', {
-			threads: results, 
-			activeThread: activeThread,
-			error: err,
-			user: req.user
-		});
+        var activeThread = threads[0],
+            threadId = activeThread.id;
+
+        comments.getComments(threadId, function (err, comments) {
+
+            console.log(comments);
+
+            if (err) req.flash('message', err.message);
+
+            res.render('index', {
+                threads: threads,
+                comments: comments,
+                activeThread: activeThread,
+                message: req.flash('message'),
+                user: req.user
+            });
+        });
+
+
 
 	});
 

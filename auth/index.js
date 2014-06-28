@@ -53,8 +53,6 @@ router.get('/register', function(req, res) {
 
 router.post('/register', function(req, res) {
 
-	console.log('begin register post');
-
 	var salt = hash.createSalt();
 
 	var user = {
@@ -65,12 +63,10 @@ router.post('/register', function(req, res) {
 		salt: salt
 	};
 
-	console.log(user);
-
 	users.addUser(user, function (err) {
 
 		if (err) {
-			req.flash('registrationError', 'Could not register.');
+			req.flash('registrationError', err.message);
 			res.redirect('/auth/register');
 		} else {
 			res.redirect('/auth/login');
@@ -94,15 +90,20 @@ router.post('/login', function(req, res, next) {
             res.redirect('/auth/login');
 		} else {
 
-			req.logIn(user, function (err) {
-				if (err) {
-                    req.flash('loginError', err.message);
-                    res.redirect('/auth/login');
+            if (user.approved) {
+                req.logIn(user, function (err) {
+                    if (err) {
+                        req.flash('loginError', err.message);
+                        res.redirect('/auth/login');
 
-				} else {
-					res.redirect('/');
-				}
-			});
+                    } else {
+                        res.redirect('/');
+                    }
+                });
+            } else {
+                req.flash('loginError', 'You are not approved');
+                res.redirect('/auth/login');
+            }
 
 		}
 	});
