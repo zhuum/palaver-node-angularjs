@@ -14,10 +14,12 @@
                     <li class="list-group-item ">
                         <a class="col-lg-2" href="/users/@user.username">@user.name</a>
                         @if (user.admin) {
-                            <span class="col-lg-offset-1 label label-primary">Admin</span>
+                            <span class="col-lg-offset-1 label label-danger">Admin</span>
                         } else if (!user.approved) {
                             <span class="col-lg-offset-1 label label-warning">Not approved</span>
-                            <a href="#" class="col-lg-offset-1">Approve</a>
+                            <a href="/users/@user.username/approve" class="col-lg-offset-1">Approve</a>
+                        } else {
+                            <span class="col-lg-offset-1 label label-primary">Approved</span>
                         }
 
                     </li>

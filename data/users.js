@@ -113,4 +113,26 @@
 
     }
 
+    users.approve = function (username, next) {
+
+        db.transaction(
+            'update users set approved = true where username = $1',
+            [username],
+            function (err) {
+                next(err);
+            }
+        );
+    }
+
+    users.unapprove = function (username, next) {
+
+        db.transaction(
+            'update users set approved = false where username = $1',
+            [username],
+            function (err) {
+                next(err);
+            }
+        );
+    }
+
 }) (module.exports);

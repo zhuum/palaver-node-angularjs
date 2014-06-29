@@ -6,6 +6,24 @@ var auth = require('../data/auth');
 var users = require('../data/users');
 var hash = require('../data/hash');
 
+
+router.get('/:username/approve', auth.ensureAdmin, function(req, res) {
+
+    users.approve(req.params.username, function (err) {
+        res.redirect('back');
+    })
+
+});
+
+
+router.get('/:username/unapprove', auth.ensureAdmin, function(req, res) {
+
+    users.unapprove(req.params.username, function (err) {
+        res.redirect('back');
+    })
+
+});
+
 router.get('/:username/changepassword', auth.ensureOwnerOrAdmin, function(req, res) {
 
     res.render('users/changepassword', {user: req.user, message: req.flash('passwordError') });
