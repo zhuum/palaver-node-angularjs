@@ -30,4 +30,17 @@
         }
     }
 
+    auth.ensureOwnerOrAdmin = function (req, res, next) {
+        if (req.isAuthenticated() ) {
+            if ( req.user.admin || req.user.username === req.params.username )  {
+                next();
+            } else {
+                res.redirect('/');
+            }
+        } else {
+            res.redirect('/auth/login');
+        }
+    }
+
+
 }) (module.exports);

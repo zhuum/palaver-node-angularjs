@@ -21,4 +21,10 @@
 		return hash.digest('hex');
 	};
 
+    hash.isPassword = function (source, salt, originalHash) {
+
+         return hash.computeHash(source, salt) === originalHash;
+
+    };
+
 }) (module.exports);

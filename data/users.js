@@ -1,7 +1,10 @@
 (function (users) {
 
 	var pg = require('pg');
-	var config = require('./config');
+    var config = require('./config');
+    var db = require('./database');
+    var hash = require('../data/hash');
+
 
 	users.addUser = function (user, next) {
 
@@ -95,5 +98,19 @@
 	users.updateUser = function(user, next) {
 		next();
 	};
+
+    users.changePassword = function (newPassword, username, next) {
+
+        var salt = hash.createSalt();
+
+        db.transaction(
+            'update users set passwordhash = $1, salt = $2 where username = $3',
+            [hash.computeHash(newPassword, salt), salt, username],
+            function (err) {
+                next(err);
+            }
+        );
+
+    }
 
 }) (module.exports);

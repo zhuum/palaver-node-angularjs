@@ -28,6 +28,8 @@
                 }
 
             </li>
+
+            <li class="list-group-item"><a href="/users/@model.user.username/changepassword">Reset password</a></li>
         </ul>
 
     </div>
