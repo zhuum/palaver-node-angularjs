@@ -14,7 +14,7 @@
                 next(err);
             else {
 
-                var text = 'SELECT * FROM comments WHERE "parentCommentId" is null';
+                var text = 'SELECT * FROM threads';
 
                 client.query(text, function (err, result) {
                     release();

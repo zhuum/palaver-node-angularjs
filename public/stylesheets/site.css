@@ -1,5 +1,16 @@
 
-body { padding-top: 60px;}
+body {
+    padding-top: 60px;
+    font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+
+a {
+    color: #00B7FF;
+}
+
+h1 {
+    margin-bottom: 40px;
+}
 
 h2 {
 	margin-top: 0;
@@ -77,4 +88,9 @@ h2 {
         top: 0;
         width: 50%; /* 6 columns */
     }
+}
+
+
+.form-format div {
+    margin-bottom: 20px;
 }

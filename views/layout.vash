@@ -6,8 +6,10 @@
 
 		<link rel="stylesheet" href="/libs/bootstrap/dist/css/bootstrap.min.css">
 		<link rel="stylesheet" href="/libs/bootstrap/dist/css/bootstrap-theme.min.css">
+
+        @html.block('head')
+
 		<link rel="stylesheet" href="/stylesheets/site.css">
-		<link rel="stylesheet" href="/stylesheets/style.css">
 
 	</head>
 	<body>
@@ -45,6 +47,7 @@
 
 		<script src="/libs/jquery/dist/jquery.min.js"></script>
 		<script src="/libs/bootstrap/dist/js/bootstrap.min.js"></script>
+
 		@html.block("scripts")
 	</body>
 </html>

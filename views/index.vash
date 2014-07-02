@@ -2,11 +2,11 @@
 	@html.block('body', function (model) {
 
 
-	    <div class="container">
+	    <div class="container" ng-app="view-threads">
 
 			<div class="row row-offcanvas row-offcanvas-right">
 		    
-			    <div class="col-xs-12 col-sm-9">
+			    <div ng-controller="controller-comments" class="col-xs-12 col-sm-9">
 
 					<p class="pull-right visible-xs">
 						<button type="button" class="btn btn-primary btn-xs" data-toggle="offcanvas">Threads</button>
@@ -20,75 +20,36 @@
 
 		    		<h2>stupid shit</h2>
 
-	    			<div class="comment">
+                    <script type="text/ng-template" id="comment-item-renderer.html">
 
-	    				<div class="comment-heading "><span class="user">marcus</span> <span class="highlight">2/28/2014 10:14am</span>
-	    					<button class="right reply btn btn-primary btn-xs" data-toggle="modal" data-target="#editor">reply</button>
-	    				</div>
-    					<div>
-	    					<p>Your bones don't break, mine do. That's clear. Your cells react to bacteria and viruses differently than mine. You don't get sick, I do. That's also clear. But for some reason, you and I react the exact same way to water. We swallow it too fast, we choke. We get some in our lungs, we drown. However unreal it may seem, we are connected, you and I. We're on the same curve, just on opposite ends.</p>
-	    				</div>
+                        <div class="comment-heading"><span class="user">{{ comment.name }}</span> <span class="highlight">{{ comment.createdTime | date: 'MMM d, yyyy h:mm:ss a' }}</span> <button class="right reply btn btn-primary btn-xs" data-toggle="modal" data-target="#editor">reply</button></div>
+                        <div>
+                            <p>{{ comment.text }}</p>
+                        </div>
 
+                        <div ng-repeat="comment in comment.comments" ng-include="'comment-item-renderer.html'" class="comment"></div>
 
-		    			<div class="comment">
-		    				<div class="comment-heading"><span class="user">marcus</span> <span class="highlight">2/28/2014 10:14am</span> <button class="right reply btn btn-primary btn-xs" data-toggle="modal" data-target="#editor">reply</button></div>
-	    					<div>
-		    					<p>this is just a test</p>
-		    				</div>
+                    </script>
+
+                    <div  ng-repeat="comment in comments" ng-include="'comment-item-renderer.html'" class="comment">
 
 
-			    			<div class="comment">
-			    				<div class="comment-heading"><span class="user">marcus</span> <span class="highlight">2/28/2014 10:14am</span> <button class="right reply btn btn-primary btn-xs" data-toggle="modal" data-target="#editor">reply</button></div>
-		    					<div>
-			    					<p>this is just a test</p>
-			    				</div>
-			    				
-			    			</div>			    				
-		    			</div>	    				
-		    			<div class="comment">
-		    				<div class="comment-heading"><span class="user">marcus</span> <span class="highlight">2/28/2014 10:14am</span> <button class="right reply btn btn-primary btn-xs" data-toggle="modal" data-target="#editor">reply</button></div>
-	    					<div>
-		    					<p>this is just a test</p>
-		    				</div>
-		    				
-		    			</div>	
-		    			<div class="comment">
-		    				<div class="comment-heading"><span class="user">marcus</span> <span class="highlight">2/28/2014 10:14am</span> <button class="right reply btn btn-primary btn-xs" data-toggle="modal" data-target="#editor">reply</button></div>
-	    					<div>
-		    					<p>this is just a test</p>
-		    				</div>
-		    				
-		    			</div>
-		    			<div class="comment">
-		    				<div class="comment-heading"><span class="user">marcus</span> <span class="highlight">2/28/2014 10:14am</span> <button class="right reply btn btn-primary btn-xs" data-toggle="modal" data-target="#editor">reply</button></div>
-	    					<div>
-		    					<p>this is just a test</p>
-		    				</div>
-		    				
-		    			</div>
 
-		    			<div class="comment">
-		    				<div class="comment-heading"><span class="user">marcus</span> <span class="highlight">2/28/2014 10:14am</span> <button class="right reply btn btn-primary btn-xs" data-toggle="modal" data-target="#editor">reply</button></div>
-	    					<div>
-		    					<p>this is just a test</p>
-		    				</div>
-		    				
-		    			</div>		    			
-	    			</div>
+                    </div>
+
+
+
 			    </div>
 
 
-		        <div class="col-xs-6 col-sm-3 sidebar-offcanvas" id="sidebar" role="navigation">
+		        <div ng-controller="controller-threads" class="col-xs-6 col-sm-3 sidebar-offcanvas" id="sidebar" role="navigation">
 
-					<div class="list-group">
-
-						@model.threads.forEach(function(thread) {
-
-							<a href="/thread/@thread.id" class="list-group-item">@thread.text</a>
-
-						})
+					<div class="list-group"  ng-repeat="t in threads">
+                    	<a href="/thread/{{ t.id }}" class="list-group-item">{{ t.title }}</a>
 					</div>
+
 		        </div>
+
 	        </div>
 
 	    </div>
@@ -119,6 +80,9 @@
 
 	@html.block('scripts', function (model) {
 
+        <script src="/libs/angular/angular.js"></script>
+        <script src="/libs/angular-bootstrap/ui-bootstrap.min.js"></script>
+        <script src="/javascripts/view-threads.js"></script>
 	})	
 })
 

@@ -3,6 +3,18 @@ var router = express.Router();
 
 var auth = require('../data/auth');
 
+router.get('/threads/lastupdated', auth.ensureApiAuthenticated, function(req, res) {
+
+    var data = require('../data/comments');
+
+    data.getLastComments(function (err, results) {
+
+        res.set('Content-Type', 'application/json');
+        res.send(results);
+
+    });
+
+});
 
 router.get('/threads/:id', auth.ensureApiAuthenticated, function(req, res) {
 	
