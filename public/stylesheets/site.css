@@ -14,6 +14,7 @@ h1 {
 
 h2 {
 	margin-top: 0;
+    font-size: 25px;
 }
 
 .right {
@@ -23,6 +24,7 @@ h2 {
 .highlight {
 	font-style: italic;
 	color: #D4DDD4;
+    margin-right: 10px;
 }
 
 .comment-heading {
@@ -34,16 +36,33 @@ h2 {
 }
 
 .comment {
-	margin-bottom: 5px;
-	padding: 5px 1px 0 5px;
-	border: 1px solid #CFCFCF;
-	border-radius: 5px;
+
+    /*padding: 5px 1px 0 10px;*/
+    border-left: 1px solid #F2F2F7;
+    padding-left: 10px;
+    border-radius: 5px;
+}
+
+.comment p {
+    margin-bottom: 15px;
+    padding:3px;
+}
+
+.unread {
+    background-color: #e4eae8;
+    border-radius: 5px;
+
 }
 
 .reply {
-	margin-right: 5px;
+    margin-bottom: 10px;
+    font-size: 11px;
 }
 
+
+a {
+    color: #a85e04;
+}
 
 /*
  * Off Canvas
@@ -93,4 +112,8 @@ h2 {
 
 .form-format div {
     margin-bottom: 20px;
+}
+
+.add-thread {
+    margin-bottom: 10px;
 }

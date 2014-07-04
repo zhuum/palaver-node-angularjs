@@ -18,14 +18,17 @@
                     </div>
                     }
 
-		    		<h2>stupid shit</h2>
+		    		<h2>{{ thread.title }} - {{ thread.name }} - {{ thread.lastUpdatedTime | date }}</h2>
 
                     <script type="text/ng-template" id="comment-item-renderer.html">
 
-                        <div class="comment-heading"><span class="user">{{ comment.name }}</span> <span class="highlight">{{ comment.createdTime | date: 'MMM d, yyyy h:mm:ss a' }}</span> <button class="right reply btn btn-primary btn-xs" data-toggle="modal" data-target="#editor">reply</button></div>
-                        <div>
-                            <p>{{ comment.text }}</p>
+                        <div class="comment-heading">
+                            <span class="user">{{ comment.name }}</span>
+                            <span class="highlight">{{ comment.createdTime | date: 'MMM d, yyyy h:mm:ss a' }}</span>
+                            <!--<a href="#" class="reply" ng-click="enterNewComment(comment)" >reply</a>-->
                         </div>
+
+                        <p ng-click="enterNewComment(comment)" class="">{{ comment.text }}</p>
 
                         <div ng-repeat="comment in comment.comments" ng-include="'comment-item-renderer.html'" class="comment"></div>
 
@@ -33,10 +36,22 @@
 
                     <div  ng-repeat="comment in comments" ng-include="'comment-item-renderer.html'" class="comment">
 
-
-
                     </div>
 
+                    <script type="text/ng-template" id="newComment.html">
+
+                        <div class="modal-header">
+                            <h3 class="modal-title">Write something</h3>
+                        </div>
+                        <div class="modal-body">
+                            <textarea id="newComment"  ng-model="input.newComment" placeholder="Enter text ..." style="width:100%; height: 250px;"></textarea>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn-warning" ng-click="close()">close</button>
+                            <button class="btn btn-primary" ng-click="createComment()">create comment</button>
+                        </div>
+
+                    </script>
 
 
 			    </div>
@@ -44,9 +59,36 @@
 
 		        <div ng-controller="controller-threads" class="col-xs-6 col-sm-3 sidebar-offcanvas" id="sidebar" role="navigation">
 
-					<div class="list-group"  ng-repeat="t in threads">
-                    	<a href="/thread/{{ t.id }}" class="list-group-item">{{ t.title }}</a>
+                    <div class="add-thread"><button class="btn btn-primary btn-xs" data-toggle="modal" data-target="#new-thread">create thread</button></div>
+
+					<div class="list-group" >
+                    	<a ng-repeat="t in threads | orderBy:lastUpdatedTime" href="#/thread/{{ t.id }}" class="list-group-item">{{ t.title }} <span class="badge">xx</span></a>
 					</div>
+
+                    <div class="modal fade" id="new-thread" role="dialog" aria-hidden="true" aria-labelledby="myModalLabel">
+                        <div class="modal-dialog modal-lg">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                                    <h3 class="modal-title">create a new thread</h3>
+                                </div>
+                                <div class="modal-body" style="background-color: white;">
+
+                                    <div class="form-group"><input ng-model="threadTitle" placeholder="enter title ..." class="form-control" type="text" /></div>
+
+                                    <div class="form-group">
+                                        <textarea ng-model="input.newComment" id="comment-text" placeholder="enter comment ..." class="form-control" style="width:100%; height: 250px;"></textarea>
+                                    </div>
+
+                                </div>
+
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-default" data-dismiss="modal">close</button>
+                                    <button ng-click="createThread()" type="button" class="btn btn-primary">create thread</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
 		        </div>
 
@@ -54,26 +96,6 @@
 
 	    </div>
 
-	    <div class="modal fade" id="editor" role="dialog" aria-hidden="true" aria-labelledby="myModalLabel">
-	    	<div class="modal-dialog modal-lg">
-	    		<div class="modal-content">
-					<div class="modal-header">
-						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-						<h4 class="modal-title" id="myModalLabel">Write something</h4>
-					</div>	    		
-					<div class="modal-body" style="background-color: white;">
-
-						<textarea id="some-textarea" placeholder="Enter text ..." style="width:100%; height: 250px;"></textarea>
-
-					</div>
-
-					<div class="modal-footer">
-						<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-						<button type="button" class="btn btn-primary">Post</button>
-					</div>				
-				</div>
-			</div>
-	    </div>
 
 
 	})
@@ -81,8 +103,9 @@
 	@html.block('scripts', function (model) {
 
         <script src="/libs/angular/angular.js"></script>
-        <script src="/libs/angular-bootstrap/ui-bootstrap.min.js"></script>
+        <!--<script src="/libs/angular-bootstrap/ui-bootstrap.min.js"></script>-->
+        <script src="/libs/angular-bootstrap/ui-bootstrap-tpls.min.js"></script>
         <script src="/javascripts/view-threads.js"></script>
-	})	
+	})
 })
 

@@ -3,6 +3,43 @@ var router = express.Router();
 
 var auth = require('../data/auth');
 
+
+router.post('/comments/create', auth.ensureApiAuthenticated, function(req, res) {
+
+    var data = require('../data/comments');
+
+    var comment = {
+        threadId: req.body.threadId,
+        parentCommentId: req.body.parentCommentId,
+        text: req.body.text,
+        userId: req.user.id
+    };
+
+    data.createComment(comment, function (err, comment) {
+
+        if (err) {
+            res.send(500, err.message);
+        } else {
+            res.send(200, comment);
+        }
+
+    });
+
+});
+
+router.get('/threads/create', auth.ensureApiAuthenticated, function(req, res) {
+
+    var data = require('../data/threads');
+
+    data.getLastComments(function (err, results) {
+
+        res.set('Content-Type', 'application/json');
+        res.send(results);
+
+    });
+
+});
+
 router.get('/threads/lastupdated', auth.ensureApiAuthenticated, function(req, res) {
 
     var data = require('../data/comments');
