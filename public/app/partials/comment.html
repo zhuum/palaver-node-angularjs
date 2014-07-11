@@ -1,0 +1,16 @@
+<div>
+    <div class="comment-heading">
+        <span class="user">{{ comment.name }}</span>
+        <span class="highlight">{{ comment.createdTime | date: 'MMM d, yyyy h:mm:ss a' }}</span>
+        <a href="javascript:;" class="reply" ng-click="showReplyText = true" >reply</a>
+    </div>
+
+    <p class="" >{{ comment.text }} </p>
+
+    <div ng-repeat="c in comment.comments" class="comment">
+        <pa-comment comment="c"></pa-comment>
+    </div>
+
+    <!-- comment editor -->
+    <pa-comment-form ng-show="showReplyText"></pa-comment-form>
+</div>

@@ -2,68 +2,25 @@
 	@html.block('body', function (model) {
 
 
-	    <div class="container" ng-app="view-threads">
+	    <div class="container-fluid" ng-app="view-threads">
 
-			<div class="row row-offcanvas row-offcanvas-right">
-		    
-			    <div ng-controller="controller-comments" class="col-xs-12 col-sm-9">
+			<div class="row">
 
-					<p class="pull-right visible-xs">
-						<button type="button" class="btn btn-primary btn-xs" data-toggle="offcanvas">Threads</button>
-					</p>
 
-                    @if (model.message != '') {
-                    <div class="alert alert-danger">
-                        @model.message
-                    </div>
-                    }
+                <div ng-controller="controller-threads" class="col-xs-6 col-sm-3 sidebar" id="sidebar" role="navigation">
 
-		    		<h2>{{ thread.title }} - {{ thread.name }} - {{ thread.lastUpdatedTime | date }}</h2>
+                    <div class="add-thread"><button class="btn btn-primary btn-xs" ng-click="newThread = true">create thread</button></div>
 
-                    <script type="text/ng-template" id="comment-item-renderer.html">
-
-                        <div class="comment-heading">
-                            <span class="user">{{ comment.name }}</span>
-                            <span class="highlight">{{ comment.createdTime | date: 'MMM d, yyyy h:mm:ss a' }}</span>
-                            <!--<a href="#" class="reply" ng-click="enterNewComment(comment)" >reply</a>-->
-                        </div>
-
-                        <p ng-click="enterNewComment(comment)" class="">{{ comment.text }}</p>
-
-                        <div ng-repeat="comment in comment.comments" ng-include="'comment-item-renderer.html'" class="comment"></div>
-
-                    </script>
-
-                    <div  ng-repeat="comment in comments" ng-include="'comment-item-renderer.html'" class="comment">
-
+                    <div ng-if="newThread" class="form-group">
+                        <input type="text" ng-model="newThreadTitle" style="margin-right: 10px;" />
+                        <button ng-click="addThread" type="button" class="btn btn-primary btn-xs">add</button>
                     </div>
 
-                    <script type="text/ng-template" id="newComment.html">
-
-                        <div class="modal-header">
-                            <h3 class="modal-title">Write something</h3>
-                        </div>
-                        <div class="modal-body">
-                            <textarea id="newComment"  ng-model="input.newComment" placeholder="Enter text ..." style="width:100%; height: 250px;"></textarea>
-                        </div>
-                        <div class="modal-footer">
-                            <button class="btn btn-warning" ng-click="close()">close</button>
-                            <button class="btn btn-primary" ng-click="createComment()">create comment</button>
-                        </div>
-
-                    </script>
-
-
-			    </div>
-
-
-		        <div ng-controller="controller-threads" class="col-xs-6 col-sm-3 sidebar-offcanvas" id="sidebar" role="navigation">
-
-                    <div class="add-thread"><button class="btn btn-primary btn-xs" data-toggle="modal" data-target="#new-thread">create thread</button></div>
-
-					<div class="list-group" >
-                    	<a ng-repeat="t in threads | orderBy:lastUpdatedTime" href="#/thread/{{ t.id }}" class="list-group-item">{{ t.title }} <span class="badge">xx</span></a>
-					</div>
+                    <ul class="nav nav-sidebar" >
+                        <li>
+                            <a ng-repeat="t in threads | orderBy:lastUpdatedTime" href="#/thread/{{ t.id }}" class="">{{ t.title }} <span class="badge">xx</span></a>
+                        </li>
+                    </ul>
 
                     <div class="modal fade" id="new-thread" role="dialog" aria-hidden="true" aria-labelledby="myModalLabel">
                         <div class="modal-dialog modal-lg">
@@ -89,8 +46,38 @@
                             </div>
                         </div>
                     </div>
+                </div>
+		    
+			    <div ng-controller="controller-comments" class="col-sm-9 col-sm-offset-3 col-md-9 col-md-offset-3 main">
 
-		        </div>
+					<p class="pull-right visible-xs">
+						<button type="button" class="btn btn-primary btn-xs" data-toggle="offcanvas">Threads</button>
+					</p>
+
+                    @if (model.message != '') {
+                    <div class="alert alert-danger">
+                        @model.message
+                    </div>
+                    }
+
+		    		<h2>{{ thread.title }} - {{ thread.name }} - {{ thread.lastUpdatedTime | date }}</h2>
+
+                    <div ng-repeat="comment in comments" class="comment">
+                        <pa-comment comment="comment"></pa-comment>
+                    </div>
+
+                    <script type="text/ng-template" id="reply-input.html">
+
+                        <div ng-if="show" style="margin-bottom: 10px;">
+                            <div><textarea ng-model="text"></textarea></div>
+                            <button class="btn btn-default btn-xs" ng-click="show = false">close</button>
+                            <button class="btn btn-primary btn-xs" ng-click="createComment({text: text})">send</button>
+                        </div>
+
+                    </script>
+
+
+			    </div>
 
 	        </div>
 
@@ -103,9 +90,9 @@
 	@html.block('scripts', function (model) {
 
         <script src="/libs/angular/angular.js"></script>
-        <!--<script src="/libs/angular-bootstrap/ui-bootstrap.min.js"></script>-->
         <script src="/libs/angular-bootstrap/ui-bootstrap-tpls.min.js"></script>
-        <script src="/javascripts/view-threads.js"></script>
+        <script src="/app/app.js"></script>
+
 	})
 })
 
