@@ -56,13 +56,18 @@ h2 {
 }
 
 .reply {
-    margin-bottom: 10px;
-    font-size: 11px;
+    margin-left: 10px;
+    font-size: 14px;
 }
 
 
 a {
     color: #3B80BC;
+}
+
+textarea {
+    width: 100%;
+    height: 150px;
 }
 
 /**/

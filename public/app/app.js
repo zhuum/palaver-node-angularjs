@@ -114,9 +114,19 @@
             restrict: 'E',
             replace: true,
             templateUrl: '/app/partials/reply-input.html',
-            link: function (scope, element, attrs) {
+            scope: {
+                comment: '=',
+                showReplyText: '='
+            },
+            link: function (scope, element) {
 
+                scope.createComment = function () {
 
+                    scope.showReplyText = false;
+
+                    element.find('textarea').val('');
+
+                }
             }
         };
     });

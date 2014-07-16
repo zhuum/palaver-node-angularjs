@@ -2,15 +2,17 @@
     <div class="comment-heading">
         <span class="user">{{ comment.name }}</span>
         <span class="highlight">{{ comment.createdTime | date: 'MMM d, yyyy h:mm:ss a' }}</span>
-        <a href="javascript:;" class="reply" ng-click="showReplyText = true" >reply</a>
     </div>
 
-    <p class="" >{{ comment.text }} </p>
+    <p ng-init="showReply = false" ng-mouseover="showReply = true" ng-click="showReply = true" ng-mouseleave="showReply = false" class="" >{{ comment.text }}
+        <a href="javascript:;"  class="reply"  ng-show="showReplyText" ng-click="showReplyText = false" >close</a>
+        <a href="javascript:;"  class="reply"  ng-show="showReply && !showReplyText" ng-click="showReplyText = true" >reply</a>
+    </p>
 
     <div ng-repeat="c in comment.comments" class="comment">
         <pa-comment comment="c"></pa-comment>
     </div>
 
     <!-- comment editor -->
-    <pa-comment-form ng-show="showReplyText"></pa-comment-form>
+    <pa-comment-form comment="comment" show-reply-text="showReplyText" ng-show="showReplyText"></pa-comment-form>
 </div>
