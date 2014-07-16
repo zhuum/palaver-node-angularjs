@@ -1,5 +1,5 @@
 <div style="margin-bottom: 10px;">
     <div><textarea ng-model="text"></textarea></div>
-    <button class="btn btn-default btn-xs" >close</button>
+    <button class="btn btn-default btn-xs" ng-click="showReplyText = false" >close</button>
     <button class="btn btn-primary btn-xs" ng-click="createComment({text: text})">create comment</button>
 </div>

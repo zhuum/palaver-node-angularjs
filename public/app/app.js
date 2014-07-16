@@ -36,74 +36,72 @@
         };
     }]);
 
+    app.factory('threadService', ['$http',  function ($http) {
+
+        return {
+            getThread: function (threadId, next) {
+                var threadUrl;
+
+                if (threadId) {
+                    threadUrl = '/api/threads/' + threadId;
+                } else {
+                    threadUrl = '/api/threads/lastupdated';
+                }
+
+                $http.get(threadUrl).then(function (result) {
+                    var thread = {
+                        comments: result.data.comments,
+                        thread: result.data.thread
+                    };
+
+                    next( thread );
+                });
+            },
+            getThreads: function (next) {
+                $http.get('/api/threads').then(function (result) {
+                    next(result.data);
+                });
+            },
+            createComment: function (comment, next) {
+
+                $http.post('/api/comments/create', comment)
+                    .success(function (result) {
+                        //$scope.getComments();
+                        next();
+                    }
+                );
+
+            },
+            createThread: function () {
+
+            }
+        }
+    } ]);
+
     app.controller('controller-threads', [
-            '$scope', '$http',
-            function ($scope, $http) {
+            '$scope', 'threadService',
+            function ($scope, threadService) {
 
                 $scope.threads = [];
 
-                $http.get('/api/threads').then(function (result) {
-                    $scope.threads = result.data;
+                threadService.getThreads(function (threads) {
+                    $scope.threads = threads;
                 });
 
-
-                $scope.createThread = function () {
-
-                    //alert($scope.threadTitle + ' : ' + $scope.newComment);
-
-
-                }
             }]
     );
 
 
     app.controller('controller-comments', [
-            '$scope', '$http', '$window', '$modal',
-            function ($scope, $http, $window, $modal) {
+            '$scope', 'threadService',
+            function ($scope, threadService) {
 
-                $scope.comments = [];
+                threadService.getThread(null, function (result) {
+                    $scope.thread = result.thread;
+                    $scope.comments = result.comments;
 
-                $scope.getComments = function () {
-                    // get the comments for a thread
-                    var urlParts = $window.location.pathname.split('/');
-
-                    var threadUrl;
-
-                    if (urlParts.length < 3) {
-                        // default or last thread
-                        threadUrl = '/api/threads/lastupdated';
-                    } else {
-                        threadUrl = '/api/threads/' + urlParts[urlParts.length - 1];
-                    }
-
-
-                    $http.get(threadUrl).then(function (result) {
-                        $scope.comments = result.data.comments;
-                        $scope.thread = result.data.thread;
-                    });
-                };
-
-                $scope.getComments();
-
-                $scope.enterNewComment = function (parentComment) {
-
-
-                };
-
-                $scope.createComment = function (comment) {
-
-                    // replace all of this with socket.io
-
-                    $http.post('/api/comments/create', comment)
-                        .success(function (result) {
-                            $scope.getComments();
-                        }
-                    );
-
-                };
-
+                })
             }]
-
     );
 
 
@@ -116,7 +114,6 @@
             restrict: 'E',
             replace: true,
             templateUrl: '/app/partials/reply-input.html',
-            scope: {},
             link: function (scope, element, attrs) {
 
 
@@ -136,15 +133,10 @@
                     // Use the compile function from the RecursionHelper,
                     // And return the linking function(s) which it returns
                     return RecursionHelper.compile(element,
-                        function (scope, element) {
-
-                            //console.log('linking comment');
+                        function (scope) {
 
                             scope.showReplyText = false;
 
-                            scope.add = function (c) {
-                                //scope.comment.comments.push({name:'marcus', text: Math.random(), comments: []});
-                            }
                         }
                     );
                 }

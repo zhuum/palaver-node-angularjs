@@ -17,8 +17,8 @@
                     </div>
 
                     <ul class="nav nav-sidebar" >
-                        <li>
-                            <a ng-repeat="t in threads | orderBy:lastUpdatedTime" href="#/thread/{{ t.id }}" class="">{{ t.title }} <span class="badge">xx</span></a>
+                        <li ng-repeat="t in threads | orderBy:lastUpdatedTime">
+                            <a  href="#/thread/{{ t.id }}" class="">{{ t.title }} <span class="badge">xx</span></a>
                         </li>
                     </ul>
 
