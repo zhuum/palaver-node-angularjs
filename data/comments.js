@@ -62,6 +62,41 @@
         });
     }
 
+    commentRepository.getThread = function (threadId, next) {
+
+        var threadQuery = 'select t.*, u.name from threads t inner join users as u on u.id = t."userId" where t.id = $1';
+
+        db.select(
+            threadQuery,
+            [threadId],
+            function (err, result) {
+
+                if (err) {
+                    next(err);
+                } else {
+
+                    var thread = result.rows[0];
+
+                    var commentQuery = 'select c.*, u.name from comments as c inner join users as u on u.id = c."userId" where "threadId" = $1 order by c.id';
+
+                    db.select(
+                        commentQuery,
+                        [thread.id],
+                        function (err, comments) {
+                            if (err) {
+                                next(err);
+                            } else {
+                                next(err, {thread: thread, comments: parseComments(comments.rows)});
+                            }
+                        }
+                    );
+                }
+            }
+
+        );
+
+    }
+
     commentRepository.getLastComments = function (next) {
 
         var threadQuery = 'select t.*, u.name from threads t inner join users as u on u.id = t."userId" order by "lastUpdatedTime" limit 1';

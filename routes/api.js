@@ -57,7 +57,7 @@ router.get('/threads/:id', auth.ensureApiAuthenticated, function(req, res) {
 	
 	var data = require('../data/comments');
 
-	data.getComments(req.params.id, function (err, results) {
+	data.getThread(req.params.id, function (err, results) {
 
 		res.set('Content-Type', 'application/json');
 		res.send(results);

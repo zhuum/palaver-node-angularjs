@@ -1,6 +1,37 @@
 ( function (angular) {
 
-    var app = angular.module('view-threads', ['ui.bootstrap']);
+    var app = angular.module('app', ['ui.bootstrap', 'ngRoute']);
+
+
+    app.config(function ($routeProvider) {
+        $routeProvider
+            .when('/threads/:threadId',
+            {
+                templateUrl: '/app/partials/comments.html',
+                controller: 'mainCtrl'
+            })
+            .when('/',
+            {
+                controller: function ($window, threadService) {
+
+                    console.log('in the / ctrl');
+
+                    threadService.getThread(null, function (result) {
+
+                        var newUrl = $window.location.href + '#/threads/' + result.thread.id;
+
+                        console.log(newUrl);
+
+                        $window.location.href = $window.location.href + '#/threads/' + result.thread.id;
+
+                    });
+
+                }
+            });
+
+    });
+
+
 
     app.factory('RecursionHelper', ['$compile', function($compile){
         return {
@@ -49,6 +80,7 @@
                 }
 
                 $http.get(threadUrl).then(function (result) {
+
                     var thread = {
                         comments: result.data.comments,
                         thread: result.data.thread
@@ -66,7 +98,6 @@
 
                 $http.post('/api/comments/create', comment)
                     .success(function (result) {
-                        //$scope.getComments();
                         next();
                     }
                 );
@@ -78,9 +109,34 @@
         }
     } ]);
 
-    app.controller('controller-threads', [
-            '$scope', 'threadService',
-            function ($scope, threadService) {
+
+    app.controller('threadCtrl', [
+            '$scope', '$routeParams', '$location', '$window', 'threadService',
+            function ($scope, $routeParams, $location, $window, threadService) {
+
+                $scope.threads = [];
+
+                threadService.getThreads(function (threads) {
+                    $scope.threads = threads;
+
+                    if ( $location.path() === '/' ) {
+                        $location.url('/threads/' + threads[0].id);
+                    }
+                });
+
+                $scope.isActive = function (threadId) {
+                    if ($location.path() === '/threads/' + threadId)
+                        return true;
+                    else
+                        return false;
+                };
+
+            }]
+    );
+
+    app.controller('mainCtrl', [
+            '$scope', '$routeParams', 'threadService',
+            function ($scope, $routeParams, threadService) {
 
                 $scope.threads = [];
 
@@ -88,15 +144,15 @@
                     $scope.threads = threads;
                 });
 
-            }]
-    );
+                $scope.activeThreadId = $routeParams.threadId;
+                console.log($scope.activeThreadId);
 
+                $scope.isActive = function (threadId) {
+                    return threadId === $scope.activeThreadId;
+                };
 
-    app.controller('controller-comments', [
-            '$scope', 'threadService',
-            function ($scope, threadService) {
-
-                threadService.getThread(null, function (result) {
+                threadService.getThread($routeParams.threadId ,
+                    function (result) {
                     $scope.thread = result.thread;
                     $scope.comments = result.comments;
 
@@ -107,6 +163,23 @@
 
     $('[data-toggle="offcanvas"]').click(function () {
         $('.row-offcanvas').toggleClass('active')
+    });
+
+    app.directive('paThreads', function () {
+        return {
+            restrict: 'EA',
+            templateUrl: '/app/partials/threads.html',
+            scope: {
+                threads: '=',
+                activeThreadId: '=',
+                isActive: '='
+            },
+            link: function (scope) {
+
+
+
+            }
+        }
     });
 
     app.directive('paCommentForm', function () {
