@@ -1,14 +1,17 @@
 <div class="col-xs-6 col-sm-3 sidebar" id="sidebar" role="navigation">
 
-    <div class="add-thread"><button class="btn btn-primary btn-xs" ng-click="newThread = true">create thread</button></div>
+    <div class="add-thread">
+        <button class="btn btn-primary btn-xs" ng-show="!newThread" ng-click="newThread = true">create thread</button>
+        <button class="btn btn-primary btn-xs" ng-show="newThread" ng-click="newThread = false">close</button>
+    </div>
 
     <div ng-show="newThread" class="form-group">
-        <input type="text" ng-model="newThreadTitle" style="margin-right: 10px;" />
-        <button ng-click="addThread" type="button" class="btn btn-primary btn-xs">add</button>
+        <input type="text" ng-model="newThreadTitle" class="col-sm-9" />
+        <button class="btn btn-primary btn-xs" ng-click="addThread" type="button" >add</button>
     </div>
 
     <ul class="nav nav-sidebar" >
-        <li ng-class="{ active: isActive(t.id, $index) }" ng-repeat="t in threads | orderBy:lastUpdatedTime">
+        <li ng-class="{ active: isActive(t.id) }" ng-repeat="t in threads | orderBy : 'lastUpdatedTime'">
             <a  href="#/threads/{{ t.id }}" >{{ t.title }} <span class="badge">xx</span></a>
         </li>
     </ul>

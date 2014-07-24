@@ -4,13 +4,11 @@
 
 	    <div class="container-fluid" ng-app="app">
 
-			<div class="row">
+			<div ng-controller="threadCtrl" class="row">
 
-                <div ng-controller="threadCtrl">
-                    <pa-threads threads="threads" is-active="isActive" ></pa-threads>
-                </div>
+                <pa-threads threads="threads" is-active="isActive" ></pa-threads>
 
-                <div ng-view></div>
+                <ng-view></ng-view>
 
 	        </div>
 

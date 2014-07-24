@@ -14,7 +14,7 @@
                 next(err);
             else {
 
-                var text = 'SELECT * FROM threads';
+                var text = 'SELECT * FROM threads'; // order by "lastUpdatedTime"';
 
                 client.query(text, function (err, result) {
                     release();

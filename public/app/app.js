@@ -8,21 +8,28 @@
             .when('/threads/:threadId',
             {
                 templateUrl: '/app/partials/comments.html',
-                controller: 'mainCtrl'
+                controller: 'mainCtrl',
+                resolve: {
+                    thread: function ($q, $route, threadService) {
+                        var defer = $q.defer();
+
+                        var threadId = $route.current.params.threadId;
+
+
+
+                        return defer;
+
+                    }
+                }
             })
             .when('/',
             {
-                controller: function ($window, threadService) {
+                template: '<div>Loading thread...</div>',
+                controller: function ($location, threadService) {
 
-                    console.log('in the / ctrl');
+                    threadService.getLatestThread(function (result) {
 
-                    threadService.getThread(null, function (result) {
-
-                        var newUrl = $window.location.href + '#/threads/' + result.thread.id;
-
-                        console.log(newUrl);
-
-                        $window.location.href = $window.location.href + '#/threads/' + result.thread.id;
+                        $location.url('/threads/' + result.thread.id);
 
                     });
 
@@ -89,6 +96,17 @@
                     next( thread );
                 });
             },
+            getLatestThread: function (next) {
+                $http.get('/api/threads/lastupdated').then(function (result) {
+
+                    var thread = {
+                        comments: result.data.comments,
+                        thread: result.data.thread
+                    };
+
+                    next( thread );
+                });
+            },
             getThreads: function (next) {
                 $http.get('/api/threads').then(function (result) {
                     next(result.data);
@@ -118,45 +136,43 @@
 
                 threadService.getThreads(function (threads) {
                     $scope.threads = threads;
-
-                    if ( $location.path() === '/' ) {
-                        $location.url('/threads/' + threads[0].id);
-                    }
                 });
 
                 $scope.isActive = function (threadId) {
-                    if ($location.path() === '/threads/' + threadId)
-                        return true;
-                    else
-                        return false;
+                    return $location.path() === '/threads/' + threadId;
                 };
 
             }]
     );
 
     app.controller('mainCtrl', [
-            '$scope', '$routeParams', 'threadService',
-            function ($scope, $routeParams, threadService) {
+            '$scope', '$routeParams', '$location', 'threadService',
+            function ($scope, $routeParams, $location, threadService) {
 
-                $scope.threads = [];
+                if ($routeParams.threadId) {
 
-                threadService.getThreads(function (threads) {
-                    $scope.threads = threads;
-                });
+                    threadService.getThread($routeParams.threadId ,
+                        function (result) {
 
-                $scope.activeThreadId = $routeParams.threadId;
-                console.log($scope.activeThreadId);
+                            $scope.thread = result.thread;
+                            $scope.comments = result.comments;
 
-                $scope.isActive = function (threadId) {
-                    return threadId === $scope.activeThreadId;
-                };
+                    });
 
-                threadService.getThread($routeParams.threadId ,
-                    function (result) {
-                    $scope.thread = result.thread;
-                    $scope.comments = result.comments;
+                } else {
 
-                })
+                    threadService.getLatestThread(
+                        function (result) {
+
+                            $location.url('/threads/' + result.thread.id);
+
+                            $scope.thread = result.thread;
+                            $scope.comments = result.comments;
+
+                    });
+
+                }
+
             }]
     );
 
