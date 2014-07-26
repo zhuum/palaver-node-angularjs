@@ -4,9 +4,11 @@ var favicon = require('static-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
-var session = require('express-session');
+var session = require('client-sessions');
 var passport = require('passport');
 var flash = require('connect-flash');
+
+var config = require("./data/config");
 
 var auth = require('./auth/index');
 var routes = require('./routes/index');
@@ -25,7 +27,23 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded());
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
-app.use(session({ secret: 'keyboard cat' }));
+
+app.use(session(config.site.session));
+
+app.use(function(req, res, next) {
+    console.log('messing with session');
+
+    if (req.session.seenyou) {
+        res.setHeader('X-Seen-You', 'true');
+    } else {
+        // setting a property will automatically cause a Set-Cookie response
+        // to be sent
+        req.session.seenyou = true;
+        res.setHeader('X-Seen-You', 'false');
+    }
+
+    next();
+});
 
 app.use(passport.initialize());
 app.use(passport.session());
@@ -66,6 +84,5 @@ app.use(function(err, req, res, next) {
         error: {}
     });
 });
-
 
 module.exports = app;
