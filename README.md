@@ -5,6 +5,7 @@ Palaver is a "chat" application, inspired by Google Wave.
 
 
 Installation
+------------
 
 npm install
 

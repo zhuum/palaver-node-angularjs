@@ -6,19 +6,8 @@
 
     <h2>{{ thread.title }} - {{ thread.name }} - {{ thread.lastUpdatedTime | date }}</h2>
 
-    <div ng-repeat="comment in comments" class="comment">
-        <pa-comment comment="comment"></pa-comment>
+    <div ng-repeat="comment in roots" class="comment">
+        <pa-comment create-comment="newComment" comment="comment"></pa-comment>
     </div>
-
-    <script type="text/ng-template" id="reply-input.html">
-
-        <div ng-if="show" style="margin-bottom: 10px;">
-            <div><textarea ng-model="text"></textarea></div>
-            <button class="btn btn-default btn-xs" ng-click="show = false">close</button>
-            <button class="btn btn-primary btn-xs" ng-click="createComment({text: text})">send</button>
-        </div>
-
-    </script>
-
 
 </div>

@@ -1,4 +1,4 @@
-(function (commentRepository) {
+(function () {
 
 	//var seedData = require('./seedData');
 
@@ -6,26 +6,20 @@
     var config = require('./config');
 
     var db = require('./database');
+    var util = require('util');
+    var events = require('events');
+    var debug = require('debug')('palaver');
 
-    var parseComments = function (comments) {
+    debug('comments repo init');
 
-        var map = {}, comment, roots = [];
-
-        for (var i = 0; i < comments.length; i += 1) {
-
-            comment = comments[i]; // get the main comment
-            comment.comments = []; // add a comments field
-
-            map[comment.id] = i; // use map to look-up the parents
-            if (comment.parentCommentId !== null ) {  // is child?
-                comments[map[comment.parentCommentId]].comments.push(comment);  // add to children
-            } else {
-                roots.push(comment);  // main thread comment, add to root
-            }
-        }
-
-        return roots;
+    function CommentsRepository () {
+        events.EventEmitter.call(this);
     }
+
+    util.inherits(CommentsRepository, events.EventEmitter);
+    var commentRepository = new CommentsRepository();
+
+    self = commentRepository;
 
     commentRepository.getComments = function (threadId, next) {
 
@@ -42,7 +36,7 @@
                     if (err) {
                         next(err);
                     } else {
-                        next(err, parseComments(result.rows));
+                        next(err, result.rows);
                     }
                 });
             }
@@ -81,12 +75,12 @@
 
                     db.select(
                         commentQuery,
-                        [thread.id],
+                        [threadId],
                         function (err, comments) {
                             if (err) {
                                 next(err);
                             } else {
-                                next(err, {thread: thread, comments: parseComments(comments.rows)});
+                                next(err, {thread: thread, comments: comments.rows});
                             }
                         }
                     );
@@ -121,7 +115,7 @@
                             if (err) {
                                 next(err);
                             } else {
-                                next(err, {thread: thread, comments: parseComments(comments.rows)});
+                                next(err, {thread: thread, comments: comments.rows});
                             }
                         }
                     );
@@ -158,6 +152,8 @@
                                 if (err) {
                                     next(err);
                                 } else {
+                                    debug(JSON.stringify(result));
+                                    commentRepository.emit('newest comment', result);
                                     next(err, result);
                                 }
                             });
@@ -169,4 +165,6 @@
         });
     };
 
-}) (module.exports);
+    module.exports = commentRepository;
+
+}) ();

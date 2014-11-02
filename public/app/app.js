@@ -8,18 +8,9 @@
             .when('/threads/:threadId',
             {
                 templateUrl: '/app/partials/comments.html',
-                controller: 'mainCtrl',
+                controller: 'commentViewCtrl',
                 resolve: {
-                    thread: function ($q, $route, threadService) {
-                        var defer = $q.defer();
-
-                        var threadId = $route.current.params.threadId;
-
-
-
-                        return defer;
-
-                    }
+                    thread: commentViewCtrl.loadComments
                 }
             })
             .when('/',
@@ -27,6 +18,9 @@
                 template: '<div>Loading thread...</div>',
                 controller: function ($location, threadService) {
 
+                    // why isn't this working?
+
+                    console.log('in index route...');
                     threadService.getLatestThread(function (result) {
 
                         $location.url('/threads/' + result.thread.id);
@@ -116,22 +110,171 @@
 
                 $http.post('/api/comments/create', comment)
                     .success(function (result) {
-                        next();
+                        next(result);
                     }
                 );
 
             },
-            createThread: function () {
-
+            createThread: function (thread, next) {
+                $http.post('/api/threads/create', thread)
+                    .success(function (result) {
+                        next();
+                    }
+                );
             }
         }
     } ]);
 
+    app.factory('commentHelper', function () {
+        return {
+            parseComments: function (comments) {
 
-    app.controller('threadCtrl', [
-            '$scope', '$routeParams', '$location', '$window', 'threadService',
-            function ($scope, $routeParams, $location, $window, threadService) {
+                var map = {},
+                    comment,
+                    roots = [];
 
+                for (var i = 0; i < comments.length; i += 1) {
+
+                    comment = comments[i]; // get the current comment from the array
+
+                    comment.comments = []; // add a comments field
+
+                    map[comment.id] = i; // add a field to the map with name of the current comment
+
+                    if ( comment.parentCommentId !== null ) {  // is child?
+
+                        comments[ map[comment.parentCommentId] ].comments.push(comment);  // add to children
+
+
+                    } else {
+                        roots.push(comment);  // main thread comment, add to root
+                    }
+                }
+
+                return {map: map, roots: roots};
+            },
+            addComment: function (comment, comments, roots, map) {
+
+                comment.comments = [];
+                var i = comments.length;
+                map[comment.id] = i;
+                comments.push(comment);
+
+
+                if ( comment.parentCommentId !== null ) {  // is child?
+
+                    comments[ map[comment.parentCommentId] ].comments.push(comment);  // add to children
+
+                } else {
+                    roots.push(comment);  // main thread comment, add to root
+                }
+
+            }
+        }
+    });
+
+    app.controller('mainCtrl' [
+            '$scope',
+            function ($scope) {
+
+                console.log('setting up sockets...');
+                var socket = io();
+
+                socket.on('new comment', function (comment) {
+                    console.log('socket.on: ' + JSON.stringify(comment));
+
+                    commentHelper.addComment(comment, $scope.comments, $scope.roots, $scope.map);
+                });
+
+            }]
+    );
+
+    var commentViewCtrl = app.controller('commentViewCtrl', [
+        '$scope', 'thread', 'threadService', 'commentHelper',
+        function ($scope, thread, threadService, commentHelper) {
+
+            //console.log($scope.thread);
+            //console.log($scope.roots);
+            //console.log($scope.comments);
+            //console.log($scope.map);
+
+            $scope.thread = thread.thread;
+            $scope.roots = thread.roots;
+            $scope.comments = thread.comments;
+            $scope.map = thread.map;
+
+
+            console.log('setting up comment sockets...');
+            var socket = io();
+
+            socket.on('new comment', function (comment) {
+                console.log('socket.on: ' + JSON.stringify(comment));
+
+                commentHelper.addComment(comment, $scope.comments, $scope.roots, $scope.map);
+            });
+
+            $scope.newComment = function (data) {
+
+                console.log('creating new comment');
+
+                var newComment = {
+                    threadId: data.parent.threadId,
+                    text: data.text,
+                    parentCommentId: data.parent.id
+                };
+
+
+                threadService.createComment(newComment, function (comment) {
+                    console.log(comment);
+                });
+
+            };
+    }]);
+
+    commentViewCtrl.loadComments = function ($q, $route, threadService, commentHelper) {
+
+        console.log('routing loading comments');
+
+        var deferred = $q.defer();
+
+        var threadId = $route.current.params.threadId;
+
+        threadService.getThread(threadId,
+            function (result) {
+
+                console.log('got thread');
+                console.log(result);
+
+                var helperResult = commentHelper.parseComments(result.comments);
+
+                var thread = {
+                    thread: result.thread,
+                    comments: result.comments,
+                    map: helperResult.map,
+                    roots: helperResult.roots
+                };
+
+                console.log('thread...');
+                console.log(thread);
+
+                deferred.resolve(thread);
+
+            });
+
+        return deferred.promise;
+    };
+
+    $('[data-toggle="offcanvas"]').click(function () {
+        $('.row-offcanvas').toggleClass('active')
+    });
+
+    app.directive('paThreads', function () {
+        return {
+            restrict: 'E',
+            templateUrl: '/app/partials/threads.html',
+            controller: function ($scope, $location, threadService) {
+
+                $scope.newThread = false;
                 $scope.threads = [];
 
                 threadService.getThreads(function (threads) {
@@ -142,58 +285,6 @@
                     return $location.path() === '/threads/' + threadId;
                 };
 
-            }]
-    );
-
-    app.controller('mainCtrl', [
-            '$scope', '$routeParams', '$location', 'threadService',
-            function ($scope, $routeParams, $location, threadService) {
-
-                if ($routeParams.threadId) {
-
-                    threadService.getThread($routeParams.threadId ,
-                        function (result) {
-
-                            $scope.thread = result.thread;
-                            $scope.comments = result.comments;
-
-                    });
-
-                } else {
-
-                    threadService.getLatestThread(
-                        function (result) {
-
-                            $location.url('/threads/' + result.thread.id);
-
-                            $scope.thread = result.thread;
-                            $scope.comments = result.comments;
-
-                    });
-
-                }
-
-            }]
-    );
-
-
-    $('[data-toggle="offcanvas"]').click(function () {
-        $('.row-offcanvas').toggleClass('active')
-    });
-
-    app.directive('paThreads', function () {
-        return {
-            restrict: 'EA',
-            templateUrl: '/app/partials/threads.html',
-            scope: {
-                threads: '=',
-                activeThreadId: '=',
-                isActive: '='
-            },
-            link: function (scope) {
-
-
-
             }
         }
     });
@@ -202,21 +293,7 @@
         return {
             restrict: 'E',
             replace: true,
-            templateUrl: '/app/partials/reply-input.html',
-            scope: {
-                comment: '=',
-                showReplyText: '='
-            },
-            link: function (scope, element) {
-
-                scope.createComment = function () {
-
-                    scope.showReplyText = false;
-
-                    element.find('textarea').val('');
-
-                }
-            }
+            templateUrl: '/app/partials/reply-input.html'
         };
     });
 
@@ -225,6 +302,7 @@
                 restrict: 'E',
                 replace: true,
                 scope: {
+                    createComment: '=',
                     comment: '='
                 },
                 templateUrl: '/app/partials/comment.html',
@@ -235,6 +313,25 @@
                         function (scope) {
 
                             scope.showReplyText = false;
+
+                            scope.foo = function () {
+
+                                console.log('foo called');
+
+                                var c = {
+                                    parent: scope.comment,
+                                    text: scope.text
+                                };
+
+                                scope.text = '';
+                                scope.showReplyText = false;
+
+                                scope.createComment(c);
+                            };
+
+                            scope.showComment = function(comment) {
+                                console.log(comment);
+                            };
 
                         }
                     );

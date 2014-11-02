@@ -31,7 +31,6 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(session(config.site.session));
 
 app.use(function(req, res, next) {
-    console.log('messing with session');
 
     if (req.session.seenyou) {
         res.setHeader('X-Seen-You', 'true');
@@ -84,5 +83,6 @@ app.use(function(err, req, res, next) {
         error: {}
     });
 });
+
 
 module.exports = app;

@@ -1,12 +1,14 @@
 var express = require('express');
 var router = express.Router();
-
+var debug = require('debug')('palaver');
 var auth = require('../data/auth');
 
 
 router.post('/comments/create', auth.ensureApiAuthenticated, function(req, res) {
 
     var data = require('../data/comments');
+
+    debug('/comments/create');
 
     var comment = {
         threadId: req.body.threadId,
@@ -20,6 +22,7 @@ router.post('/comments/create', auth.ensureApiAuthenticated, function(req, res) 
         if (err) {
             res.send(500, err.message);
         } else {
+            debug('sending: ' + JSON.stringify(comment));
             res.send(200, comment);
         }
 
