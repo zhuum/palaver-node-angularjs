@@ -4,7 +4,7 @@
 
 	    <div class="container-fluid" ng-app="app">
 
-			<div class="row">
+			<div class="row" >
 
                 <pa-threads></pa-threads>
 
@@ -27,6 +27,8 @@
         <script src="/libs/angular-bootstrap/ui-bootstrap-tpls.min.js"></script>
 
         <script src="/libs/socket.io-client/socket.io.js"></script>
+
+		<script src="/libs/angular-socket-io/socket.js"></script>
 
         <script src="/app/app.js"></script>
 

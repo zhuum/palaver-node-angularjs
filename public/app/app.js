@@ -1,6 +1,6 @@
 ( function (angular) {
 
-    var app = angular.module('app', ['ui.bootstrap', 'ngRoute']);
+    var app = angular.module('app', ['ui.bootstrap', 'ngRoute', 'btford.socket-io']);
 
 
     app.config(function ($routeProvider) {
@@ -18,8 +18,6 @@
                 template: '<div>Loading thread...</div>',
                 controller: function ($location, threadService) {
 
-                    // why isn't this working?
-
                     console.log('in index route...');
                     threadService.getLatestThread(function (result) {
 
@@ -32,7 +30,10 @@
 
     });
 
-
+    app.factory('socket', function (socketFactory) {
+        var socket = socketFactory();
+        return socket;
+    });
 
     app.factory('RecursionHelper', ['$compile', function($compile){
         return {
@@ -155,6 +156,8 @@
             },
             addComment: function (comment, comments, roots, map) {
 
+                console.log('commentHelper.addComment');
+
                 comment.comments = [];
                 var i = comments.length;
                 map[comment.id] = i;
@@ -177,45 +180,33 @@
             '$scope',
             function ($scope) {
 
-                console.log('setting up sockets...');
-                var socket = io();
-
-                socket.on('new comment', function (comment) {
-                    console.log('socket.on: ' + JSON.stringify(comment));
-
-                    commentHelper.addComment(comment, $scope.comments, $scope.roots, $scope.map);
-                });
-
             }]
     );
 
     var commentViewCtrl = app.controller('commentViewCtrl', [
-        '$scope', 'thread', 'threadService', 'commentHelper',
-        function ($scope, thread, threadService, commentHelper) {
+        '$scope', 'thread', 'threadService', 'commentHelper', 'socket',
+        function ($scope, thread, threadService, commentHelper, socket) {
 
-            //console.log($scope.thread);
-            //console.log($scope.roots);
-            //console.log($scope.comments);
-            //console.log($scope.map);
+            console.log('commentViewCtrl: loading...');
 
             $scope.thread = thread.thread;
             $scope.roots = thread.roots;
             $scope.comments = thread.comments;
             $scope.map = thread.map;
 
+            console.log('commentViewCtrl: setting up comment sockets...');
 
-            console.log('setting up comment sockets...');
-            var socket = io();
+            socket.forward('new comment', $scope);
 
-            socket.on('new comment', function (comment) {
-                console.log('socket.on: ' + JSON.stringify(comment));
+            $scope.$on('socket:new comment', function (ev, comment) {
+                console.log('commentViewCtrl: socket.on: ' + JSON.stringify(comment));
 
                 commentHelper.addComment(comment, $scope.comments, $scope.roots, $scope.map);
             });
 
             $scope.newComment = function (data) {
 
-                console.log('creating new comment');
+                console.log('creating new comment - commentViewCtrl');
 
                 var newComment = {
                     threadId: data.parent.threadId,
@@ -265,7 +256,7 @@
     };
 
     $('[data-toggle="offcanvas"]').click(function () {
-        $('.row-offcanvas').toggleClass('active')
+        $('.row-offcanvas').toggleClass('active');
     });
 
     app.directive('paThreads', function () {
@@ -276,6 +267,24 @@
 
                 $scope.newThread = false;
                 $scope.threads = [];
+
+                console.log('setting up thread sockets...');
+                var socket = io();
+
+                socket.on('new thread', function (thread) {
+                    console.log('socket.on(new thread): ' + JSON.stringify(thread));
+
+                    // add thread to list
+                    $scope.threads.push(thread);
+
+                });
+
+                socket.on('new comment', function (comment) {
+                    console.log('paThreads: socket.on(new comment): ' + JSON.stringify(comment));
+
+                    // update new comment count badge
+
+                });
 
                 threadService.getThreads(function (threads) {
                     $scope.threads = threads;
