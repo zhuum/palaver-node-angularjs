@@ -69,6 +69,19 @@
         };
     }]);
 
+    app.factory('userService', ['$http',  function ($http) {
+
+        return {
+
+            getUsername: function () {
+                // gets the username from a global object... there is probably a better way to do this.
+                return palaver.username;
+            }
+
+        };
+
+    }]);
+
     app.factory('threadService', ['$http',  function ($http) {
 
         return {
@@ -122,6 +135,9 @@
                         next();
                     }
                 );
+            },
+            markRead: function(commentId) {
+                $http.get('/api/comments/read/' + commentId);
             }
         }
     } ]);
@@ -184,8 +200,8 @@
     );
 
     var commentViewCtrl = app.controller('commentViewCtrl', [
-        '$scope', 'thread', 'threadService', 'commentHelper', 'socket',
-        function ($scope, thread, threadService, commentHelper, socket) {
+        '$scope', 'thread', 'threadService', 'commentHelper', 'socket', 'userService',
+        function ($scope, thread, threadService, commentHelper, socket, userService) {
 
             console.log('commentViewCtrl: loading...');
 
@@ -200,6 +216,12 @@
 
             $scope.$on('socket:new comment', function (ev, comment) {
                 console.log('commentViewCtrl: socket.on: ' + JSON.stringify(comment));
+
+                if (comment.name === userService.getUsername() ) {
+                    comment.isRead = true;
+                } else {
+                    comment.isRead = false;
+                }
 
                 commentHelper.addComment(comment, $scope.comments, $scope.roots, $scope.map);
             });
@@ -219,6 +241,10 @@
                     console.log(comment);
                 });
 
+            };
+
+            $scope.markRead = function (commentId) {
+              threadService.markRead(commentId);
             };
     }]);
 
@@ -263,12 +289,14 @@
         return {
             restrict: 'E',
             templateUrl: '/app/partials/threads.html',
-            controller: function ($scope, $location, threadService) {
+            controller: function ($scope, $location, threadService, socket) {
 
                 $scope.newThread = false;
                 $scope.threads = [];
 
                 console.log('setting up thread sockets...');
+
+                // TODO: ********** CHANGE THIS TO USE FACTORY *************
                 var socket = io();
 
                 socket.on('new thread', function (thread) {
@@ -287,11 +315,17 @@
                 });
 
                 threadService.getThreads(function (threads) {
+                    console.log(threads);
                     $scope.threads = threads;
                 });
 
                 $scope.isActive = function (threadId) {
                     return $location.path() === '/threads/' + threadId;
+                };
+
+                $scope.addThread = function () {
+                    console.log('adding new thread: ' + $scope.newThreadTitle);
+                    $scope.newThread = false;
                 };
 
             }
@@ -306,7 +340,7 @@
         };
     });
 
-    app.directive('paComment', function (RecursionHelper) {
+    app.directive('paComment', function (RecursionHelper, threadService) {
             return {
                 restrict: 'E',
                 replace: true,
@@ -340,6 +374,11 @@
 
                             scope.showComment = function(comment) {
                                 console.log(comment);
+                            };
+
+                            scope.markRead = function (comment) {
+                                comment.isRead = true;
+                                threadService.markRead(comment.id);
                             };
 
                         }

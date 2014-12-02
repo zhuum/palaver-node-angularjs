@@ -4,16 +4,18 @@
         <span class="highlight">{{ comment.createdTime | date: 'MMM d, yyyy h:mm:ss a' }}</span>
     </div>
 
-    <p ng-init="showReply = false" ng-mouseover="showReply = true" ng-click="showReply = true" ng-mouseleave="showReply = false" class="" >
+    <p ng-init="showReply = false" ng-mouseover="showReply = true" ng-mouseleave="showReply = false" ng-class="{unread: !comment.isRead}" >
         {{ comment.text }}
+        <a href="javascript:;"  class="reply"  ng-show="!comment.isRead" ng-click="markRead(comment)" >mark as read</a>
         <a href="javascript:;"  class="reply"  ng-show="showReplyText" ng-click="showReplyText = false" >close</a>
         <a href="javascript:;"  class="reply"  ng-show="showReply && !showReplyText" ng-click="showReplyText = true" >reply</a>
     </p>
+
+    <!-- comment editor -->
+    <pa-comment-form  show-reply-text="showReplyText" ng-show="showReplyText"></pa-comment-form>
 
     <div ng-repeat="c in comment.comments" class="comment">
         <pa-comment create-comment="createComment" comment="c"></pa-comment>
     </div>
 
-    <!-- comment editor -->
-    <pa-comment-form  show-reply-text="showReplyText" ng-show="showReplyText"></pa-comment-form>
 </div>

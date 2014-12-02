@@ -30,8 +30,15 @@
 
 		<script src="/libs/angular-socket-io/socket.js"></script>
 
+		<script>
+			var palaver = {
+				username: '@model.user.name'
+			};
+		</script>
+
         <script src="/app/app.js"></script>
 
 	})
+
 })
 

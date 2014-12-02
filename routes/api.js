@@ -3,6 +3,7 @@ var router = express.Router();
 var debug = require('debug')('palaver');
 var auth = require('../data/auth');
 
+var events = require('events');
 
 router.post('/comments/create', auth.ensureApiAuthenticated, function(req, res) {
 
@@ -27,6 +28,31 @@ router.post('/comments/create', auth.ensureApiAuthenticated, function(req, res) 
         }
 
     });
+
+});
+
+router.get('/comments/read/:id', auth.ensureApiAuthenticated, function(req, res) {
+
+    var data = require('../data/comments');
+
+    debug('/comments/read');
+
+    var commentId = req.params.id,
+        userId = req.user.id;
+
+    debug('commentId: ' + commentId + '; userId: ' + userId);
+
+    data.markRead(req.params.id, req.user.id, function (err) {
+
+        if (err) {
+            res.send(500, err.message);
+        } else {
+            res.send(200);
+        }
+
+    });
+
+    res.send(200);
 
 });
 
