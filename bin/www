@@ -12,7 +12,8 @@ var server = http.createServer(app).listen(app.get('port'), function () {
 
 var updater = require('../updater');
 var comments = require('../data/comments');
-updater.init(server, comments);
+var threads = require('../data/threads');
+updater.init(server, comments, threads);
 
 
 

@@ -132,7 +132,8 @@
             createThread: function (thread, next) {
                 $http.post('/api/threads/create', thread)
                     .success(function (result) {
-                        next();
+                        console.log('create thread post back');
+                        next(result);
                     }
                 );
             },
@@ -217,6 +218,8 @@
             $scope.$on('socket:new comment', function (ev, comment) {
                 console.log('commentViewCtrl: socket.on: ' + JSON.stringify(comment));
 
+                if ($scope.thread.id !== comment.threadId) return;
+
                 if (comment.name === userService.getUsername() ) {
                     comment.isRead = true;
                 } else {
@@ -231,7 +234,7 @@
                 console.log('creating new comment - commentViewCtrl');
 
                 var newComment = {
-                    threadId: data.parent.threadId,
+                    threadId: $scope.thread.id,
                     text: data.text,
                     parentCommentId: data.parent.id
                 };
@@ -245,6 +248,20 @@
 
             $scope.markRead = function (commentId) {
               threadService.markRead(commentId);
+            };
+
+            $scope.foo = function () {
+                console.log('new top comment');
+
+                var c = {
+                    parent: {id: undefined}, // no parent
+                    text: $scope.text
+                };
+
+                $scope.text = '';
+                $scope.showReplyText = false;
+
+                $scope.newComment(c);
             };
     }]);
 
@@ -296,21 +313,20 @@
 
                 console.log('setting up thread sockets...');
 
-                // TODO: ********** CHANGE THIS TO USE FACTORY *************
-                var socket = io();
+                //socket.forward('new comment', $scope);
+                socket.forward('new thread', $scope);
+                //
+                //$scope.$on('socket:new comment', function (ev, comment) {
+                //
+                //    console.log('thread: new socket');
+                //
+                //
+                //});
 
-                socket.on('new thread', function (thread) {
-                    console.log('socket.on(new thread): ' + JSON.stringify(thread));
+                $scope.$on('socket:new thread', function (ev, thread) {
+                    console.log('socket thread: new thread');
 
-                    // add thread to list
                     $scope.threads.push(thread);
-
-                });
-
-                socket.on('new comment', function (comment) {
-                    console.log('paThreads: socket.on(new comment): ' + JSON.stringify(comment));
-
-                    // update new comment count badge
 
                 });
 
@@ -325,6 +341,12 @@
 
                 $scope.addThread = function () {
                     console.log('adding new thread: ' + $scope.newThreadTitle);
+
+                    threadService.createThread({text: $scope.newThreadTitle}, function (result) {
+                        console.log('createThread result');
+                        console.log(result);
+                    });
+
                     $scope.newThread = false;
                 };
 

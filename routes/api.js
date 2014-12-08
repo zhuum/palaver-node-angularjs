@@ -56,11 +56,16 @@ router.get('/comments/read/:id', auth.ensureApiAuthenticated, function(req, res)
 
 });
 
-router.get('/threads/create', auth.ensureApiAuthenticated, function(req, res) {
+router.post('/threads/create', auth.ensureApiAuthenticated, function(req, res) {
 
     var data = require('../data/threads');
 
-    data.getLastComments(function (err, results) {
+    var newThread = {
+        text: req.body.text,
+        userId: req.user.id
+    };
+
+    data.createThread(newThread, function (err, results) {
 
         res.set('Content-Type', 'application/json');
         res.send(results);
@@ -86,12 +91,14 @@ router.get('/threads/:id', auth.ensureApiAuthenticated, function(req, res) {
 	
 	var data = require('../data/comments');
 
+    var threadOnly = req.query.threadonly;
+
 	data.getThread(req.params.id, function (err, results) {
 
 		res.set('Content-Type', 'application/json');
 		res.send(results);
 
-	});
+	}, threadOnly);
 
 });
 

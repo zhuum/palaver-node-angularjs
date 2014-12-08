@@ -5,7 +5,7 @@
 
     debug('loading updater');
 
-    updater.init = function (server, comments) {
+    updater.init = function (server, comments, threads) {
 
         var io = socketio.listen(server);
 
@@ -20,6 +20,12 @@
             debug('new comment created event: ' + JSON.stringify(comment));
 
             io.sockets.emit('new comment', comment);
+
+        });
+
+        threads.on('new thread', function (thread) {
+
+            io.sockets.emit('new thread', thread);
 
         });
     };

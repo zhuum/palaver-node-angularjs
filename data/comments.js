@@ -65,7 +65,7 @@
         });
     };
 
-    commentRepository.getThread = function (threadId, next) {
+    commentRepository.getThread = function (threadId, next, onlyThreadInfo) {
 
         var threadQuery = 'select t.*, u.name from threads t inner join users as u on u.id = t."userId" where t.id = $1';
 
@@ -80,22 +80,28 @@
 
                     var thread = result.rows[0];
 
-                    var commentQuery = 'select c.*, u.name, unreadcomments.id is null "isRead" ' +
-                        'from comments as c inner join users as u on (c."userId" = u.id) ' +
-                        'left outer join unreadcomments on (c.id = unreadcomments."comment_commentId" and "user_userId" = u.id) ' +
-                        'where c."threadId" = $1 order by c.id';
+                    if (!onlyThreadInfo) {
+                        var commentQuery = 'select c.*, u.name, unreadcomments.id is null "isRead" ' +
+                            'from comments as c inner join users as u on (c."userId" = u.id) ' +
+                            'left outer join unreadcomments on (c.id = unreadcomments."comment_commentId" and "user_userId" = u.id) ' +
+                            'where c."threadId" = $1 order by c.id';
 
-                    db.select(
-                        commentQuery,
-                        [threadId],
-                        function (err, comments) {
-                            if (err) {
-                                next(err);
-                            } else {
-                                next(err, {thread: thread, comments: comments.rows});
+                        db.select(
+                            commentQuery,
+                            [threadId],
+                            function (err, comments) {
+                                if (err) {
+                                    next(err);
+                                } else {
+                                    next(err, {thread: thread, comments: comments.rows});
+                                }
                             }
-                        }
-                    );
+                        );
+                    } else {
+                        next(err, {thread: thread});
+                    }
+
+
                 }
             }
 

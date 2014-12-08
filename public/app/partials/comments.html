@@ -4,7 +4,8 @@
         <button type="button" class="btn btn-primary btn-xs" data-toggle="offcanvas">Threads</button>
     </p>
 
-    <h2>{{ thread.title }} - {{ thread.name }} - {{ thread.lastUpdatedTime | date }}</h2>
+    <h2 ng-mouseover="showReply = true" ng-mouseleave="showReply = false">{{ thread.title }} - {{ thread.name }} - {{ thread.lastUpdatedTime | date }} <a href="javascript:;"  class="reply"  ng-show="showReply && !showReplyText" ng-click="showReplyText = true" >reply</a></h2>
+    <pa-comment-form  show-reply-text="showReplyText" ng-show="showReplyText"></pa-comment-form>
 
     <div ng-repeat="comment in roots" class="comment">
         <pa-comment create-comment="newComment" comment="comment"></pa-comment>
