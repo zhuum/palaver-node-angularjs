@@ -93,7 +93,7 @@ router.get('/threads/:id', auth.ensureApiAuthenticated, function(req, res) {
 
     var threadOnly = req.query.threadonly;
 
-	data.getThread(req.params.id, function (err, results) {
+	data.getThread(req.params.id, req.user.id, function (err, results) {
 
 		res.set('Content-Type', 'application/json');
 		res.send(results);

@@ -65,7 +65,7 @@
         });
     };
 
-    commentRepository.getThread = function (threadId, next, onlyThreadInfo) {
+    commentRepository.getThread = function (threadId, userId, next, onlyThreadInfo) {
 
         var threadQuery = 'select t.*, u.name from threads t inner join users as u on u.id = t."userId" where t.id = $1';
 
@@ -83,12 +83,12 @@
                     if (!onlyThreadInfo) {
                         var commentQuery = 'select c.*, u.name, unreadcomments.id is null "isRead" ' +
                             'from comments as c inner join users as u on (c."userId" = u.id) ' +
-                            'left outer join unreadcomments on (c.id = unreadcomments."comment_commentId" and "user_userId" = u.id) ' +
+                            'left outer join unreadcomments on (c.id = unreadcomments."comment_commentId" and "user_userId" = $2) ' +
                             'where c."threadId" = $1 order by c.id';
 
                         db.select(
                             commentQuery,
-                            [threadId],
+                            [threadId, userId],
                             function (err, comments) {
                                 if (err) {
                                     next(err);
