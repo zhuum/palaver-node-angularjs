@@ -193,16 +193,44 @@
         }
     });
 
+    app.service('commentChannel', function ($rootScope) {
+
+        var newCommentMessage = 'newCommentMessage',
+            readCommentMessage = 'readCommentMessage';
+
+        return {
+            newComment: function (comment) {
+                $rootScope.$broadcast(newCommentMessage, comment);
+            },
+
+            onNewComment: function ($scope, handler) {
+                $scope.$on(newCommentMessage, function (event, message) {
+                    handler(message);
+                });
+            },
+            readComment: function (comment) {
+                $rootScope.$broadcast(readCommentMessage, comment);
+            },
+            onReadComment: function ($scope, handler) {
+                $scope.$on(readCommentMessage, function (event, message){
+                    handler(message);
+                });
+            }
+        };
+
+    });
+
+
     app.controller('mainCtrl' [
             '$scope',
             function ($scope) {
-
+                console.log('loading mainCtrl');
             }]
     );
 
     var commentViewCtrl = app.controller('commentViewCtrl', [
-        '$scope', 'thread', 'threadService', 'commentHelper', 'socket', 'userService',
-        function ($scope, thread, threadService, commentHelper, socket, userService) {
+        '$scope', 'thread', 'threadService', 'commentHelper', 'socket', 'userService', 'commentChannel',
+        function ($scope, thread, threadService, commentHelper, socket, userService, commentChannel) {
 
             console.log('commentViewCtrl: loading...');
 
@@ -217,6 +245,8 @@
 
             $scope.$on('socket:new comment', function (ev, comment) {
                 console.log('commentViewCtrl: socket.on: ' + JSON.stringify(comment));
+
+                commentChannel.newComment(comment);
 
                 if ($scope.thread.id !== comment.threadId) return;
 
@@ -246,8 +276,9 @@
 
             };
 
-            $scope.markRead = function (commentId) {
-              threadService.markRead(commentId);
+            $scope.markRead = function (comment) {
+                console.log('commentViewCtrl: markRead(...)');
+                threadService.markRead(comment.id);
             };
 
             $scope.foo = function () {
@@ -306,22 +337,16 @@
         return {
             restrict: 'E',
             templateUrl: '/app/partials/threads.html',
-            controller: function ($scope, $location, threadService, socket) {
+            controller: function ($scope, $location, threadService, socket, commentChannel, userService) {
 
                 $scope.newThread = false;
                 $scope.threads = [];
+                $scope.unread = 0;
 
                 console.log('setting up thread sockets...');
 
                 //socket.forward('new comment', $scope);
                 socket.forward('new thread', $scope);
-                //
-                //$scope.$on('socket:new comment', function (ev, comment) {
-                //
-                //    console.log('thread: new socket');
-                //
-                //
-                //});
 
                 $scope.$on('socket:new thread', function (ev, thread) {
                     console.log('socket thread: new thread');
@@ -330,9 +355,57 @@
 
                 });
 
+                commentChannel.onNewComment($scope, function (comment) {
+
+                    console.log('thread: onNewComment');
+
+                    if (comment.name !== userService.getUsername() ) {
+
+                        for (var i = 0; i < $scope.threads.length; i++) {
+
+                            if (comment.threadId === $scope.threads[i].id) {
+                                $scope.threads[i].unread++;
+                                $scope.unread++;
+                                $scope.updateTitle($scope.unread);
+                            }
+
+                        }
+                    }
+
+                });
+
+                commentChannel.onReadComment($scope, function (comment) {
+
+                    console.log('thread: onReadComment');
+
+                    for (var i = 0; i < $scope.threads.length; i++) {
+
+                        if (comment.threadId === $scope.threads[i].id) {
+                            $scope.threads[i].unread--;
+                            $scope.unread--;
+                            $scope.updateTitle($scope.unread);
+                        }
+
+                    }
+
+                });
+
                 threadService.getThreads(function (threads) {
                     console.log(threads);
                     $scope.threads = threads;
+
+                    for (var i = 0; i < $scope.threads.length; i++) {
+
+                        console.log($scope.threads[i].unread);
+
+                        $scope.unread += Number($scope.threads[i].unread);
+
+                    }
+
+                    console.log($scope.unread);
+
+                    $scope.updateTitle($scope.unread);
+
                 });
 
                 $scope.isActive = function (threadId) {
@@ -350,6 +423,17 @@
                     $scope.newThread = false;
                 };
 
+                $scope.updateTitle = function (unread) {
+
+                    console.log('updating title');
+
+                    var title = '[b]<' + unread + '>palaver';
+
+                    document.title= title;
+                };
+
+
+
             }
         }
     });
@@ -362,7 +446,7 @@
         };
     });
 
-    app.directive('paComment', function (RecursionHelper, threadService) {
+    app.directive('paComment', function (RecursionHelper, threadService, commentChannel) {
             return {
                 restrict: 'E',
                 replace: true,
@@ -400,6 +484,7 @@
 
                             scope.markRead = function (comment) {
                                 comment.isRead = true;
+                                commentChannel.readComment(comment);
                                 threadService.markRead(comment.id);
                             };
 

@@ -111,7 +111,7 @@ router.get('/threads', auth.ensureApiAuthenticated, function(req, res) {
 
 	//console.log(data);
 
-	data.getThreads(function (err, results) {
+	data.getThreads(req.user.id, function (err, results) {
 
 		console.log(results);
 

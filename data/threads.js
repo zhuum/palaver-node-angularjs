@@ -16,7 +16,7 @@
     util.inherits(ThreadRepository, events.EventEmitter);
     var threadRepository = new ThreadRepository();
 
-    threadRepository.getThreads = function (next) {
+    threadRepository.getThreads = function (userId, next) {
 
         pg.connect(config.database.connstring, function (err, client, release) {
 
@@ -24,9 +24,13 @@
                 next(err);
             else {
 
-                var text = 'SELECT * FROM threads'; // order by "lastUpdatedTime"';
+                //var text = 'SELECT * FROM threads'; // order by "lastUpdatedTime"';
 
-                client.query(text, function (err, result) {
+                var text = 'SELECT threads.id, threads.title, threads."lastUpdatedTime", count(unreadcomments.id) as unread FROM threads ' +
+                'left outer join unreadcomments on ( threads.id = unreadcomments."threadId" and unreadcomments."user_userId" = $1 ) ' +
+                'group by threads.id, threads.title, threads."lastUpdatedTime"';
+
+                client.query(text, [userId], function (err, result) {
                     release();
                     if (err) {
                         next(err);

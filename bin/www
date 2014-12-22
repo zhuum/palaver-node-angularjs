@@ -3,17 +3,33 @@ var debug = require('debug')('palaver');
 var app = require('../server');
 
 app.set('port', process.env.PORT || 3000);
+app.set('sslport', process.env.SSLPORT || 3443);
 
 var http = require('http');
+var https = require('https');
 
-var server = http.createServer(app).listen(app.get('port'), function () {
-    debug('Express server listening on port ' + server.address().port);
+var fs = require('fs');
+
+var privateKey = fs.readFileSync('./ssl/server.key').toString();
+var certificate = fs.readFileSync('./ssl/server.crt').toString();
+
+var options = {
+    key : privateKey,
+    cert : certificate
+};
+
+//var server = http.createServer(app).listen(app.get('port'), function () {
+//    debug('Express server listening on port ' + server.address().port);
+//});
+
+var secureServer = https.createServer(options, app).listen(3443, function () {
+    debug('Express secure server listening on port ' + secureServer.address().port);
 });
 
 var updater = require('../updater');
 var comments = require('../data/comments');
 var threads = require('../data/threads');
-updater.init(server, comments, threads);
+updater.init(secureServer, comments, threads);
 
 
 

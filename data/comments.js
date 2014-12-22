@@ -144,7 +144,7 @@
 
     };
 
-    commentRepository.createUnread = function (commentId, commentUserId, next) {
+    commentRepository.createUnread = function (commentId, commentUserId, threadId, next) {
 
         pg.connect(config.database.connstring, function (err, client, release) {
 
@@ -152,8 +152,8 @@
                 var count = 0;
                 for (var i = 0; i < users.length; i++) {
                     if (commentUserId != users[i].id) {
-                        var queryText = 'insert into unreadcomments ("comment_commentId", "user_userId") values ($1, $2)';
-                        client.query(queryText, [commentId, users[i].id], function (err) {
+                        var queryText = 'insert into unreadcomments ("comment_commentId", "user_userId", "threadId") values ($1, $2, $3)';
+                        client.query(queryText, [commentId, users[i].id, threadId], function (err) {
                             if (err) {
                                 debug(err);
                             }
@@ -195,11 +195,12 @@
                             release();
 
                             var commentId = results.rows[0].id,
-                                commentUserId = comment.userId;
+                                commentUserId = comment.userId,
+                                threadId = comment.threadId;
 
                             // populate unread
 
-                            commentRepository.createUnread(commentId, commentUserId, function () {
+                            commentRepository.createUnread(commentId, commentUserId, threadId, function () {
 
                                 commentRepository.getComment(commentId, function (err, result) {
                                     if (err) {
