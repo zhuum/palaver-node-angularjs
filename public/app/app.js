@@ -1,6 +1,50 @@
 ( function (angular) {
 
-    var app = angular.module('app', ['ui.bootstrap', 'ngRoute', 'btford.socket-io']);
+    angular.module('textAngularTest', ['textAngular'])
+        .config(['$provide', function($provide){
+            // this demonstrates how to register a new tool and add it to the default toolbar
+            $provide.decorator('taOptions', ['$delegate', function(taOptions){
+                // $delegate is the taOptions we are decorating
+                // here we override the default toolbars and classes specified in taOptions.
+                taOptions.toolbar = [
+                    ['bold', 'italics', 'underline', 'ul', 'ol', 'redo', 'undo', 'clear'],
+                    [ 'insertLink' ]
+                    //[ 'insertImage', 'insertLink', 'insertVideo']
+                ];
+                taOptions.classes = {
+                    focused: 'focused',
+                    toolbar: 'btn-toolbar',
+                    toolbarGroup: 'btn-group',
+                    toolbarButton: 'btn btn-default',
+                    toolbarButtonActive: 'active',
+                    disabled: 'disabled',
+                    textEditor: 'form-control',
+                    htmlEditor: 'form-control'
+                };
+                return taOptions; // whatever you return will be the taOptions
+            }]);
+        }]);
+
+    angular.module('palaverDirectives', []).directive('keydownEvents', [
+        '$document',
+        '$rootScope',
+        function($document, $rootScope) {
+
+            return {
+                restrict: 'A',
+                link: function () {
+                    $document.bind('keydown', function (event) {
+                        console.log('palaverDirectives', 'keydown');
+                        $rootScope.$broadcast('keydown', event);
+                        $rootScope.$broadcast('keydown:' + event.keyCode, event);
+
+                    });
+                }
+            }
+        }
+    ]);
+
+    var app = angular.module('app', ['ui.bootstrap', 'ngRoute', 'btford.socket-io', 'textAngularTest', 'palaverDirectives']);
 
 
     app.config(function ($routeProvider) {
@@ -144,6 +188,17 @@
     } ]);
 
     app.factory('commentHelper', function () {
+
+        console.log('scrolling');
+
+        var scrollTo = function (comment) {
+            $("html, body").animate({
+                scrollTop: comment.offset().top - 300
+            }, 500, function () {
+                comment.addClass('animated shake');
+            });
+        };
+
         return {
             parseComments: function (comments) {
 
@@ -189,6 +244,23 @@
                     roots.push(comment);  // main thread comment, add to root
                 }
 
+            },
+            scrollTo: scrollTo,
+            scrollToNext: function() {
+                var $unread = $(".unread");
+
+                if ( $unread.length > 0 ) {
+
+                    var nextUnread = $($unread[0]);
+
+                    scrollTo(nextUnread);
+
+                    nextUnread.removeClass('unread');
+
+                }
+            },
+            getCommentElement: function(comment) {
+                return $('div[data-comment-id="' + comment.id + '"]');
             }
         }
     });
@@ -229,8 +301,8 @@
     );
 
     var commentViewCtrl = app.controller('commentViewCtrl', [
-        '$scope', 'thread', 'threadService', 'commentHelper', 'socket', 'userService', 'commentChannel',
-        function ($scope, thread, threadService, commentHelper, socket, userService, commentChannel) {
+        '$scope', '$window', '$document', 'thread', 'threadService', 'commentHelper', 'socket', 'userService', 'commentChannel',
+        function ($scope, $window, $document, thread, threadService, commentHelper, socket, userService, commentChannel) {
 
             console.log('commentViewCtrl: loading...');
 
@@ -259,6 +331,16 @@
                 commentHelper.addComment(comment, $scope.comments, $scope.roots, $scope.map);
             });
 
+            $scope.$on('keydown:32', function (onEvent, keypressEvent) {
+
+                var $focusElem = $(":focus");
+                if(!($focusElem.is("input") || $focusElem.attr("contenteditable") == "true")) {
+                    commentHelper.scrollToNext();
+                    onEvent.preventDefault();
+                }
+
+            });
+
             $scope.newComment = function (data) {
 
                 console.log('creating new comment - commentViewCtrl');
@@ -271,7 +353,23 @@
 
 
                 threadService.createComment(newComment, function (comment) {
-                    console.log(comment);
+                    console.log('create comment', comment);
+
+                    var check = function () {
+                        var c = commentHelper.getCommentElement(comment);
+
+                        console.log('create comment element', c);
+
+                        if (c.length > 0)
+                            commentHelper.scrollTo(c);
+                        else
+                            setTimeout(function () {
+                                check();
+                            }, 50);
+                    };
+
+                    check();
+
                 });
 
             };
@@ -396,13 +494,9 @@
 
                     for (var i = 0; i < $scope.threads.length; i++) {
 
-                        console.log($scope.threads[i].unread);
-
                         $scope.unread += Number($scope.threads[i].unread);
 
                     }
-
-                    console.log($scope.unread);
 
                     $scope.updateTitle($scope.unread);
 
@@ -427,7 +521,7 @@
 
                     console.log('updating title');
 
-                    var title = '[b]<' + unread + '>palaver';
+                    var title = '[' + unread + '] palaver <beta>';
 
                     document.title= title;
                 };
@@ -446,7 +540,7 @@
         };
     });
 
-    app.directive('paComment', function (RecursionHelper, threadService, commentChannel) {
+    app.directive('paComment', function (RecursionHelper, threadService, commentChannel, $timeout) {
             return {
                 restrict: 'E',
                 replace: true,
@@ -465,18 +559,47 @@
 
                             scope.foo = function () {
 
-                                console.log('foo called');
-
                                 var c = {
                                     parent: scope.comment,
-                                    text: scope.text
+                                    text: scope.text || ''
                                 };
 
                                 scope.text = '';
                                 scope.showReplyText = false;
 
-                                scope.createComment(c);
+                                if (c.text.trim() !== '')
+                                    scope.createComment(c);
                             };
+
+                            scope.showReplyForm = function (commentId) {
+
+                                scope.showReplyText = true;
+
+                                var $ele =  $('#reply-' + commentId);
+
+                                $timeout(function() {
+                                    var text = $('#reply-' +  commentId + ' div[id^=taTextElement]');
+
+                                    console.log(text[0]);
+
+                                    // shitty hack for setting focus to the empty content editable div
+                                    text.html(' ');
+                                    text.focus();
+                                    text.html('');
+
+                                }, 100);
+                            };
+
+                            scope.keypressed = function (event) {
+
+                                if (event.keyCode === 13 && event.shiftKey === true) {
+                                    scope.foo();
+                                }
+
+                                event.stopPropagation();
+
+                            };
+
 
                             scope.showComment = function(comment) {
                                 console.log(comment);
@@ -486,6 +609,11 @@
                                 comment.isRead = true;
                                 commentChannel.readComment(comment);
                                 threadService.markRead(comment.id);
+                            };
+
+                            scope.setFocus = function (comment) {
+                                console.log('setFocus', comment);
+
                             };
 
                         }

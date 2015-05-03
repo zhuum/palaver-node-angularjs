@@ -7,6 +7,9 @@
 		<link rel="stylesheet" href="/libs/bootstrap/dist/css/bootstrap.min.css">
 		<link rel="stylesheet" href="/libs/bootstrap/dist/css/bootstrap-theme.min.css">
 
+		<link rel="stylesheet" href="/libs/animate.css/animate.min.css">
+
+
         @html.block('head')
 
 		<link rel="stylesheet" href="/stylesheets/site.css">

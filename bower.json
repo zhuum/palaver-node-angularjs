@@ -1,0 +1,28 @@
+{
+  "name": "palaver",
+  "version": "0.0.0",
+  "homepage": "https://github.com/zhuum/palaver",
+  "authors": [
+    "Marcus <marcus.mckinnon@gmail.com>"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "public/libs",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "angular-ui-bootstrap": "~0.11.0",
+    "angular-bootstrap": "~0.11.0",
+    "angular-route": "~1.2.20",
+    "bootstrap": "~3.2.0",
+    "socket.io-client": "~1.0.6",
+    "textAngular": "~1.2.2",
+    "fontawesome": "~4.2.0",
+    "angular-socket-io": "~0.6.0",
+    "animate.css": "~3.2.6"
+  }
+}

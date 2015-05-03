@@ -3,3 +3,4 @@
 data/config.js
 node_modules/*
 ssl/*
+flightplan.js

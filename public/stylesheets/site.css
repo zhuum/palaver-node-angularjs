@@ -45,11 +45,17 @@ h2 {
 }
 
 .comment p {
+    margin: 0;
+    padding: 0;
+}
+
+.comment-text {
+    margin-top: 5px;
     margin-bottom: 15px;
-    padding:3px;
 }
 
 .unread {
+    padding: 5px;
     background-color: #e4eae8;
     border-radius: 5px;
 
@@ -57,7 +63,7 @@ h2 {
 
 .reply {
     margin-left: 10px;
-    font-size: 14px;
+    font-size: 11px;
 }
 
 
@@ -181,4 +187,8 @@ textarea {
 .nav > li > a:focus {
     background-color: transparent;
     color: #3B80BC;
+}
+
+.focus {
+    background-color: #a6e1ec;
 }

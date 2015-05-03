@@ -1,15 +1,15 @@
 <div>
-    <div class="comment-heading">
+    <div class="comment-heading" ng-init="showReply = false" ng-mouseover="showReply = true" ng-mouseleave="showReply = false">
         <span class="user">{{ comment.name }}</span>
         <span class="highlight">{{ comment.createdTime | date: 'MMM d, yyyy h:mm:ss a' }}</span>
-    </div>
-
-    <p ng-init="showReply = false" ng-mouseover="showReply = true" ng-mouseleave="showReply = false" ng-class="{unread: !comment.isRead}" >
-        {{ comment.text }}
         <a href="javascript:;"  class="reply"  ng-show="!comment.isRead" ng-click="markRead(comment)" >mark as read</a>
         <a href="javascript:;"  class="reply"  ng-show="showReplyText" ng-click="showReplyText = false" >close</a>
-        <a href="javascript:;"  class="reply"  ng-show="showReply && !showReplyText" ng-click="showReplyText = true" >reply</a>
-    </p>
+        <a href="javascript:;"  class="reply"  ng-show="showReply && !showReplyText" ng-click="showReplyForm(comment.id)" >reply</a>
+    </div>
+
+    <div class="comment-text" ng-click="setFocus(comment); $event.stopPropagation();" data-comment-id="{{ comment.id }}" ng-class="{unread: !comment.isRead}" ng-init="showReply = false" ng-mouseover="showReply = true" ng-mouseleave="showReply = false">
+        <div ng-bind-html="comment.text"></div>
+    </div>
 
     <!-- comment editor -->
     <pa-comment-form  show-reply-text="showReplyText" ng-show="showReplyText"></pa-comment-form>
