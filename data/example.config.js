@@ -6,6 +6,11 @@
 		connstring: "postgres://postgres:password@localhost/palaver"
 	};
 
+    config.ssl = {
+        privateKey: './ssl/server.key',
+        certificate: './ssl/server.crt'
+    };
+
     config.site = {
         session: {
             cookieName: 'session',

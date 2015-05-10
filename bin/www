@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 var debug = require('debug')('palaver');
 var app = require('../server');
+var config = require('../data/config');
 
 app.set('port', process.env.PORT || 3000);
 app.set('sslport', process.env.SSLPORT || 3443);
@@ -10,8 +11,8 @@ var https = require('https');
 
 var fs = require('fs');
 
-var privateKey = fs.readFileSync('./ssl/server.key').toString();
-var certificate = fs.readFileSync('./ssl/server.crt').toString();
+var privateKey = fs.readFileSync(config.ssl.privateKey).toString();
+var certificate = fs.readFileSync(config.ssl.certificate).toString();
 
 var options = {
     key : privateKey,
@@ -22,7 +23,7 @@ var options = {
 //    debug('Express server listening on port ' + server.address().port);
 //});
 
-var secureServer = https.createServer(options, app).listen(3443, function () {
+var secureServer = https.createServer(options, app).listen(8443, function () {
     debug('Express secure server listening on port ' + secureServer.address().port);
 });
 
