@@ -450,6 +450,15 @@
                 $scope.threads = [];
                 $scope.unread = 0;
 
+                $scope.$watch('unread', function (newValue, oldValue) {
+
+                    console.log('watch unread:', oldValue, newValue);
+
+                    var title = '[' + newValue + '] palaver <beta>';
+
+                    document.title = title;
+                });
+
                 console.log('setting up thread sockets...');
 
                 //socket.forward('new comment', $scope);
@@ -468,15 +477,18 @@
 
                     if (comment.name !== userService.getUsername() ) {
 
+                        var thread;
+
                         for (var i = 0; i < $scope.threads.length; i++) {
 
                             if (comment.threadId === $scope.threads[i].id) {
-                                $scope.threads[i].unread++;
-                                $scope.unread++;
-                                $scope.updateTitle($scope.unread);
+                                thread = $scope.threads[i];
+                                break;
                             }
-
                         }
+
+                        thread.unread++;
+                        $scope.unread++;
                     }
 
                 });
@@ -485,34 +497,39 @@
 
                     console.log('thread: onReadComment');
 
+                    var unread = $scope.unread;
+
                     for (var i = 0; i < $scope.threads.length; i++) {
 
                         if (comment.threadId === $scope.threads[i].id) {
                             $scope.threads[i].unread--;
-                            $scope.unread--;
-                            $scope.updateTitle($scope.unread);
+                            unread--;
                         }
 
                     }
+
+                    $scope.unread = unread;
 
                 });
 
                 threadService.getThreads(function (threads) {
                     console.log('threads:', threads);
 
-                    for (var i = 0; i < $scope.threads.length; i++) {
 
-                        $scope.unread += Number($scope.threads[i].unread);
+                    var unread = 0;
 
-                        var time = $scope.threads[i].lastUpdatedTime;
+                    for (var i = 0; i < threads.length; i++) {
 
-                        $scope.threads[i].lastUpdatedTime = new Date(time);
+                        unread += Number(threads[i].unread);
+
+                        var time = threads[i].lastUpdatedTime;
+
+                        threads[i].lastUpdatedTime = new Date(time);
 
                     }
 
                     $scope.threads = threads;
-
-                    $scope.updateTitle($scope.unread);
+                    $scope.unread = unread;
 
                 });
 
@@ -528,15 +545,6 @@
                     });
 
                     $scope.newThread = false;
-                };
-
-                $scope.updateTitle = function (unread) {
-
-                    console.log('updating title');
-
-                    var title = '[' + unread + '] palaver <beta>';
-
-                    document.title= title;
                 };
 
 
