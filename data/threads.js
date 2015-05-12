@@ -72,6 +72,31 @@
 
     };
 
+    threadRepository.updateLastUpdatedTime = function (threadId, next) {
+        pg.connect(config.database.connstring, function (err, client, release) {
+
+            var queryText = 'update threads set "lastUpdatedTime" = $1 where "id" = $2';
+            client.query(queryText, [ Date.now(), threadId ], function (err, results) {
+
+                if (err) {
+                    client.query('ROLLBACK', function (err) {
+                        release();
+                        next(err);
+                    });
+                } else {
+                    client.query('COMMIT', function (err) {
+                        release();
+
+                        next(err);
+
+                    });
+                }
+
+            });
+        });
+
+    };
+
     module.exports = threadRepository;
 
 }) ();

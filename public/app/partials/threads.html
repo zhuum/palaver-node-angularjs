@@ -11,7 +11,7 @@
     </div>
 
     <ul class="nav nav-sidebar" >
-        <li ng-class="{ active: isActive(t.id) }" ng-repeat="t in threads | orderBy : 'lastUpdatedTime'">
+        <li ng-class="{ active: isActive(t.id) }" ng-repeat="t in threads | orderBy : '-lastUpdatedTime'">
             <a  href="#/threads/{{ t.id }}" >{{ t.title }} <span class="badge" ng-show="t.unread > 0">{{t.unread}}</span></a>
         </li>
     </ul>

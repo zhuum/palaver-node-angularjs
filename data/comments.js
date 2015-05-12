@@ -10,6 +10,7 @@
     var debug = require('debug')('palaver');
 
     var userRepository = require('./users');
+    var threadRepository = require('./threads');
 
     debug('comments repo init');
 

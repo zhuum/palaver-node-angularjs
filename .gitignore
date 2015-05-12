@@ -4,3 +4,5 @@ data/config.js
 node_modules/*
 ssl/*
 flightplan.js
+public/libs/*
+data/production.config.js

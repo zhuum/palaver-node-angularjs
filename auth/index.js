@@ -23,6 +23,9 @@ function verifyUser(username, password, next) {
 				return;
 			}
 		}
+		else {
+			console.log('error:', err);
+		}
 
 		next(err, false, {message: 'Invalid credentials'});
 	})
@@ -86,6 +89,7 @@ router.post('/login', function(req, res, next) {
 
 	var authFunc = passport.authenticate('local', function (err, user, info) {
 		if (err || info) {
+			console.log('error:', err);
             req.flash('loginError', 'Invalid credentials');
             res.redirect('/auth/login');
 		} else {

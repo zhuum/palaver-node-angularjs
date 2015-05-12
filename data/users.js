@@ -47,8 +47,9 @@
 		
 		pg.connect(config.database.connstring, function (err, client, release) {
 
-			if (err) 
-				next(err);
+			if (err) {
+                next(err);
+            }
 			else {
 
 				var text = 'select * from users where username = $1';

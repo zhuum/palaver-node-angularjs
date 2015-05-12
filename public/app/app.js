@@ -34,7 +34,6 @@
                 restrict: 'A',
                 link: function () {
                     $document.bind('keydown', function (event) {
-                        console.log('palaverDirectives', 'keydown');
                         $rootScope.$broadcast('keydown', event);
                         $rootScope.$broadcast('keydown:' + event.keyCode, event);
 
@@ -257,6 +256,8 @@
 
                     nextUnread.removeClass('unread');
 
+                    return nextUnread;
+
                 }
             },
             getCommentElement: function(comment) {
@@ -335,8 +336,18 @@
 
                 var $focusElem = $(":focus");
                 if(!($focusElem.is("input") || $focusElem.attr("contenteditable") == "true")) {
-                    commentHelper.scrollToNext();
+
                     onEvent.preventDefault();
+
+                    var commentEle = commentHelper.scrollToNext();
+                    var commentId = $(commentEle).attr('data-comment-id');
+                    var comment = $scope.comments[$scope.map[commentId]];
+
+                    comment.isRead = true;
+                    commentChannel.readComment(comment);
+                    threadService.markRead(comment.id);
+
+
                 }
 
             });
@@ -405,8 +416,7 @@
         threadService.getThread(threadId,
             function (result) {
 
-                console.log('got thread');
-                console.log(result);
+                console.log('got thread', result);
 
                 var helperResult = commentHelper.parseComments(result.comments);
 
@@ -417,8 +427,7 @@
                     roots: helperResult.roots
                 };
 
-                console.log('thread...');
-                console.log(thread);
+                console.log('thread', thread);
 
                 deferred.resolve(thread);
 
@@ -489,14 +498,19 @@
                 });
 
                 threadService.getThreads(function (threads) {
-                    console.log(threads);
-                    $scope.threads = threads;
+                    console.log('threads:', threads);
 
                     for (var i = 0; i < $scope.threads.length; i++) {
 
                         $scope.unread += Number($scope.threads[i].unread);
 
+                        var time = $scope.threads[i].lastUpdatedTime;
+
+                        $scope.threads[i].lastUpdatedTime = new Date(time);
+
                     }
+
+                    $scope.threads = threads;
 
                     $scope.updateTitle($scope.unread);
 
@@ -510,8 +524,7 @@
                     console.log('adding new thread: ' + $scope.newThreadTitle);
 
                     threadService.createThread({text: $scope.newThreadTitle}, function (result) {
-                        console.log('createThread result');
-                        console.log(result);
+                        console.log('createThread result', result);
                     });
 
                     $scope.newThread = false;

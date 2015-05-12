@@ -23,7 +23,7 @@ var options = {
 //    debug('Express server listening on port ' + server.address().port);
 //});
 
-var secureServer = https.createServer(options, app).listen(8443, function () {
+var secureServer = https.createServer(options, app).listen(config.site.sslport, function () {
     debug('Express secure server listening on port ' + secureServer.address().port);
 });
 
