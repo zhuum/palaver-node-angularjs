@@ -2,7 +2,7 @@
 
 Palaver is a "chat" application, inspired by Google Wave.
 
-# dependancies
+# Dependancies
 
 * Git - http://git-scm.com/
 * Node.js
