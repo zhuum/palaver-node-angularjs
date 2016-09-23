@@ -124,20 +124,22 @@
                 } else {
 
                     var thread = result.rows[0];
+                    if (thread)
+                    {
+	                    var commentQuery = 'select c.*, u.name from comments as c inner join users as u on u.id = c."userId" where "threadId" = $1 order by c.id';
 
-                    var commentQuery = 'select c.*, u.name from comments as c inner join users as u on u.id = c."userId" where "threadId" = $1 order by c.id';
-
-                    db.select(
-                        commentQuery,
-                        [thread.id],
-                        function (err, comments) {
-                            if (err) {
-                                next(err);
-                            } else {
-                                next(err, {thread: thread, comments: comments.rows});
-                            }
-                        }
-                    );
+	                    db.select(
+	                        commentQuery,
+	                        [thread.id],
+	                        function (err, comments) {
+	                            if (err) {
+	                                next(err);
+	                            } else {
+	                                next(err, {thread: thread, comments: comments.rows});
+	                            }
+	                        }
+	                    );
+                	}
                 }
             }
 
